@@ -1,16 +1,16 @@
-import React, {useContext, useState}                                                               from "react";
-import {Avatar, Button, Layout, Menu, Typography}                                                  from "antd";
-import {LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PartitionOutlined, SolutionOutlined} from "@ant-design/icons";
-import css                                                                                         from './core.module.less';
-import used                                                                                        from "@/word/used";
-import {UserinfoContext}                                                                           from "@/word/state";
-import {Route, Switch, useHistory}                                                                 from "react-router-dom";
-import request                                                                                     from "umi-request";
-import SearchSelect                                                                                from "@/pack/searchSelect";
-import {HintMenu}                                                                                  from "@/word/hint";
-import AdminUser                                                                                   from "@/page/admin/user/list";
-import AdminDepartment                                                                             from "@/page/admin/department/list";
-import AdminPosition                                                                               from "@/page/admin/position/list";
+import React, {useContext, useState}                                                                                                 from "react";
+import {Avatar, Button, Layout, Menu, Typography}                                                                                    from "antd";
+import {HomeOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PartitionOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
+import css                                                                                                                           from './core.module.less';
+import used                                                                                                                          from "@/word/used";
+import {UserinfoContext}                                                                                                             from "@/word/state";
+import {Route, Switch, useHistory}                                                                                                   from "react-router-dom";
+import request                                                                                                                       from "umi-request";
+import SearchSelect                                                                                                                  from "@/pack/searchSelect";
+import {HintMenu}                                                                                                                    from "@/word/hint";
+import AdminUser                                                                                                                     from "@/page/admin/user/list";
+import AdminDepartment                                                                                                               from "@/page/admin/department/list";
+import AdminPosition                                                                                                                 from "@/page/admin/position/list";
 
 const {SubMenu} = Menu;
 
@@ -31,6 +31,12 @@ const Core: React.FC = () => {
                     }
                 </div>
                 <Menu theme="dark" mode="inline">
+                    <Menu.Item key={'/home'} icon={<HomeOutlined/>}>
+                        首页
+                    </Menu.Item>
+                    <Menu.Item key={'/enterprise'} icon={<UserSwitchOutlined/>}>
+                        企业列表
+                    </Menu.Item>
                     <SubMenu key={'/admin'} level={1} icon={<SolutionOutlined/>} title={'后台权限'}>
                         <Menu.Item key={'/admin/user'} onClick={() => history.push('/admin/user')}>
                             管理员用户
