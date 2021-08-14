@@ -1,0 +1,128 @@
+.root {
+    height: 100vh;
+
+    & .tag {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 35px;
+        justify-content: space-around;
+
+        & > h4 {
+            margin-top: 15px;
+            margin-bottom: 0;
+        }
+    }
+
+    & .logo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #f8f8f8;
+    }
+
+    .embed {
+        margin-top: 15px;
+        width: 32px;
+        height: 32px;
+    }
+
+    & .right {
+        .head {
+            background: #fff;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            min-width: 500px;
+            width: 100%;
+
+            .toolbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+
+                .left {
+                    display: flex;
+                    align-items: center;
+
+                    .page-header-heading-left {
+                        margin: 0 !important;
+                    }
+
+                    .title1 {
+                        margin: 0 10px 0 0;
+                    }
+
+                    .title2 {
+                        color: #817d7d !important;
+                        margin: 0 20px 0 0;
+                    }
+
+                    .search {
+                        float: right;
+                        margin: 2.5px 0 0 20px;
+                        width: 200px;
+                    }
+                }
+
+                .right {
+                    margin-right: 24px;
+                }
+            }
+        }
+
+        .trigger {
+            padding: 5px 24px 0 24px;
+            font-size: 18px;
+            line-height: 64px;
+            cursor: pointer;
+            transition: color 0.3s;
+
+            &:hover {
+                color: #1890ff;
+            }
+        }
+    }
+}
+
+.main {
+    padding: 16px;
+}
+
+.group {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+
+    .setting {
+        color: #fff;
+    }
+
+    .logout {
+        color: #ee0941
+    }
+}
+
+.show {
+    padding: 0 24px;
+
+    .detail {
+        padding: 15px 0;
+        color: #ccc;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .userinfo {
+        padding: 15px 0;
+        display: flex;
+    }
+}
+
+.avatar {
+    width: auto;
+    height: auto;
+    margin: 2px 20px 0 20px;
+}
