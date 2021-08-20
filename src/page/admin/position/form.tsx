@@ -18,6 +18,7 @@ interface Props {
 
 const Detail: React.FC<Props> = (props) => {
     const formRef = useRef<FormInstance>();
+    const [status, setStatus] = useState<number>(1);
     const [pageIdOutlineMap, setPageIdOutlineMap] = useState<PageIdOutlineMap>({});
     const [departmentOutlineArr, setDepartmentOutlineArr] = useState<ReOption[]>([]);
     const [menuGroupOutlineArr, setMenuGroupOutlineArr] = useState<MenuGroupOutline[]>([]);
@@ -29,120 +30,99 @@ const Detail: React.FC<Props> = (props) => {
         ) {
             formRef.current?.resetFields();
             setPageIdMenuGroupIdMap({});
-            new Promise(
-                (resolve, reject) => {
-                    if (departmentOutlineArr.length === 0) {
-                        request('/api/admin/department/outline', {method: 'POST'}).then(
-                            ({status, data: departmentOutlineArr = []}: {
-                                status: number;
-                                data: DepartmentOutline[];
-                            }) => {
-                                if (status === 200) {
-                                    let reDepartmentArr: ReOption[] = [];
-                                    for (let i = 0; i < departmentOutlineArr.length; i++) {
-                                        const departmentOutline = departmentOutlineArr[i];
-                                        reDepartmentArr.push({
-                                            label: departmentOutline.name,
-                                            value: departmentOutline.id
-                                        });
+            setStatus(1);
+            if (
+                (props.visit.id > 0 && props.visit.action === 'update') ||
+                (props.visit.id === 0 && props.visit.action === 'create')
+            ) {
+                request('/api/admin/position/' + props.visit.id, {method: 'POST'}).then(
+                    ({
+                         data,
+                         status:                       resStatus,
+                         admin_page_outline_arr:       {data: pageOutlineArr},
+                         admin_menu_group_outline_arr: {data: menuGroupOutlineArr},
+                         admin_department_outline_arr: {data: departmentOutlineArr},
+                     }) => {
+                        new Promise<MenuGroupOutline[]>(
+                            resolve => {
+                                if (resStatus > 202) {
+                                    message.error('服务器请求出错');
+                                    return
+                                }
+                                let newPageIdOutlineMap: PageIdOutlineMap = {};
+                                for (let i = 0; i < pageOutlineArr.length; i++) {
+                                    const pageOutline = pageOutlineArr[i];
+                                    newPageIdOutlineMap[pageOutline.id] = pageOutline;
+                                }
+                                let pageIdMenuGroupOutlineArrMap: PageIdMenuGroupOutlineArrMap = {};
+                                for (let i = 0; i < menuGroupOutlineArr.length; i++) {
+                                    const menuGroupOutline = menuGroupOutlineArr[i];
+                                    let usedMenuGroupOutlineArr = pageIdMenuGroupOutlineArrMap[menuGroupOutline.admin_page_id];
+                                    if (usedMenuGroupOutlineArr !== undefined) {
+                                        usedMenuGroupOutlineArr[0].span += 1;
+                                        menuGroupOutline.span = 0;
+                                        usedMenuGroupOutlineArr.push(menuGroupOutline);
+                                    } else {
+                                        menuGroupOutline.span = 1;
+                                        pageIdMenuGroupOutlineArrMap[menuGroupOutline.admin_page_id] = [menuGroupOutline];
                                     }
-                                    setDepartmentOutlineArr(reDepartmentArr);
+                                }
+                                let newMenuGroupOutlineArr: MenuGroupOutline[] = [];
+                                for (let pageId in pageIdMenuGroupOutlineArrMap) {
+                                    newMenuGroupOutlineArr.push(...pageIdMenuGroupOutlineArrMap[pageId]);
+                                }
+                                setPageIdOutlineMap(newPageIdOutlineMap);
+                                setMenuGroupOutlineArr(newMenuGroupOutlineArr);
+                                resolve(newMenuGroupOutlineArr);
+                            }
+                        ).then(
+                            nextMenuGroupOutlineArr => {
+                                let reDepartmentArr: ReOption[] = [];
+                                for (let i = 0; i < departmentOutlineArr.length; i++) {
+                                    const departmentOutline = departmentOutlineArr[i];
+                                    reDepartmentArr.push({
+                                        label: departmentOutline.name,
+                                        value: departmentOutline.id
+                                    });
+                                }
+                                setDepartmentOutlineArr(reDepartmentArr);
+                                if (data) {
+                                    const {
+                                              status,
+                                              id,
+                                              name,
+                                              weight,
+                                              description,
+                                              admin_department_id,
+                                              admin_menu_group_id_arr
+                                          } = data;
+                                    if (Boolean(admin_menu_group_id_arr)) {
+                                        let newPageIdMenuGroupIdMap: PageIdMenuGroupIdMap = {};
+                                        const idArr = admin_menu_group_id_arr as number[];
+                                        const arr = nextMenuGroupOutlineArr as MenuGroupOutline[];
+                                        for (let i = 0; i < arr.length; i++) {
+                                            if (idArr.indexOf(arr[i].id) !== -1) {
+                                                newPageIdMenuGroupIdMap[arr[i].admin_page_id] = arr[i].id;
+                                            }
+                                        }
+                                        setPageIdMenuGroupIdMap(newPageIdMenuGroupIdMap);
+                                        console.log('log[ref]: ', newPageIdMenuGroupIdMap);
+                                    }
+                                    setStatus(status);
+                                    formRef.current?.setFieldsValue({
+                                        id,
+                                        status,
+                                        name,
+                                        weight,
+                                        description,
+                                        admin_department_id
+                                    });
                                 }
                             }
                         )
-                        request('/api/admin/menu/group/outline', {method: 'POST'}).then(
-                            ({status, data: menuGroupOutlineArr = []}: {
-                                data: MenuGroupOutline[];
-                                status: number;
-                            }) => {
-                                if (status === 200) {
-                                    request('/api/admin/page/outline', {method: 'POST'}).then(
-                                        ({status, data: pageOutlineArr = []}: {
-                                            status: number;
-                                            data: PageOutline[];
-                                        }) => {
-                                            if (status === 200) {
-                                                let newPageIdOutlineMap: PageIdOutlineMap = {};
-                                                for (let i = 0; i < pageOutlineArr.length; i++) {
-                                                    const pageOutline = pageOutlineArr[i];
-                                                    newPageIdOutlineMap[pageOutline.id] = pageOutline;
-                                                }
-                                                let pageIdMenuGroupOutlineArrMap: PageIdMenuGroupOutlineArrMap = {};
-                                                for (let i = 0; i < menuGroupOutlineArr.length; i++) {
-                                                    const menuGroupOutline = menuGroupOutlineArr[i];
-                                                    let usedMenuGroupOutlineArr = pageIdMenuGroupOutlineArrMap[menuGroupOutline.admin_page_id];
-                                                    if (usedMenuGroupOutlineArr !== undefined) {
-                                                        usedMenuGroupOutlineArr[0].span += 1;
-                                                        menuGroupOutline.span = 0;
-                                                        usedMenuGroupOutlineArr.push(menuGroupOutline);
-                                                    } else {
-                                                        menuGroupOutline.span = 1;
-                                                        pageIdMenuGroupOutlineArrMap[menuGroupOutline.admin_page_id] = [menuGroupOutline];
-                                                    }
-                                                }
-                                                let newMenuGroupOutlineArr: MenuGroupOutline[] = [];
-                                                for (let pageId in pageIdMenuGroupOutlineArrMap) {
-                                                    newMenuGroupOutlineArr.push(...pageIdMenuGroupOutlineArrMap[pageId]);
-                                                }
-                                                setPageIdOutlineMap(newPageIdOutlineMap);
-                                                setMenuGroupOutlineArr(newMenuGroupOutlineArr);
-                                                resolve(newMenuGroupOutlineArr);
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    message.error('获取服务器数据出错');
-                                    reject([]);
-                                }
-                            },
-                        );
-                    } else {
-                        resolve(menuGroupOutlineArr);
-                    }
-                }
-            )
-                .then(
-                    (nextMenuGroupOutlineArr) => {
-                        if (props.visit.id > 0 && props.visit.action === 'update') {
-                            request('/api/admin/position/' + props.visit.id, {method: 'POST'}).then(
-                                ({status: resStatue, data}) => {
-                                    formRef.current?.resetFields();
-                                    if (resStatue === 200) {
-                                        const {
-                                                  status,
-                                                  id,
-                                                  name,
-                                                  weight,
-                                                  description,
-                                                  admin_department_id,
-                                                  admin_menu_group_id_arr
-                                              } = data;
-                                        if (Boolean(admin_menu_group_id_arr)) {
-                                            let newPageIdMenuGroupIdMap: PageIdMenuGroupIdMap = {};
-                                            const idArr = admin_menu_group_id_arr as number[];
-                                            const arr = nextMenuGroupOutlineArr as MenuGroupOutline[];
-                                            for (let i = 0; i < arr.length; i++) {
-                                                if (idArr.indexOf(arr[i].id) !== -1) {
-                                                    newPageIdMenuGroupIdMap[arr[i].admin_page_id] = arr[i].id;
-                                                }
-                                            }
-                                            setPageIdMenuGroupIdMap(newPageIdMenuGroupIdMap);
-                                            console.log('log[ref]: ', newPageIdMenuGroupIdMap);
-                                        }
-                                        formRef.current?.setFieldsValue({
-                                            id,
-                                            status,
-                                            name,
-                                            weight,
-                                            description,
-                                            admin_department_id
-                                        });
-                                    }
-                                }
-                            )
-                        }
                     }
                 )
+            }
         }
     }, [props.visit.id]);
     const pageMenuGroupColumnArr: TableColumnProps<MenuGroupOutline>[] =
@@ -264,11 +244,18 @@ const Detail: React.FC<Props> = (props) => {
                             label="岗位启用状态"
                             width={200}
                             name="status"
-                            options={[
-                                {label: '启用', value: 1},
-                                {label: '停用', value: 2},
-                                {label: '锁定', value: 3},
-                            ]}
+                            disabled={props.visit.id === 0 || status === 1}
+                            options={
+                                status === 1 ?
+                                [
+                                    {label: '新数据', value: 1}
+                                ] :
+                                [
+                                    {label: '使用中', value: 2},
+                                    {label: '异常', value: 3},
+                                    {label: '停用', value: 4},
+                                ]
+                            }
                         />
                     </ProForm.Group>
                     <ProForm.Group label="基本信息">

@@ -18,7 +18,9 @@ interface Row {
     name: string;
     weight: string;
     admin_department_id: number;
-    admin_department_name: string;
+    admin_department: {
+        name: string;
+    };
     description: string;
     created_at: string;
     updated_at: string;
@@ -39,13 +41,16 @@ const AdminPosition: React.FC = () => {
         {
             title:     '所属部门',
             dataIndex: 'admin_department_name',
-            order:     10,
             search:    false,
+            render:    (_, row) => (
+                <>
+                    {row.admin_department.name}
+                </>
+            )
         },
         {
             title:     '名称',
             dataIndex: 'name',
-            order:     9,
             render:    (val, row) => (
                 <div dangerouslySetInnerHTML={{__html: row.name}}/>
             )
@@ -64,22 +69,24 @@ const AdminPosition: React.FC = () => {
             valueType: 'option',
             render:    (_, row) => {
                 let menuArr: ActionMenuItem[] = [];
-                menuArr.push({
-                    key:  'delete',
-                    name: (
-                              <ConfirmDelete
-                                  key={'delete'}
-                                  url="/admin/position"
-                                  id_arr={[row.id]}
-                                  onConfirm={() => {
-                                      actionRef.current?.reload();
-                                      clearSelected();
-                                  }}
-                              >
-                                  <span>删除</span>
-                              </ConfirmDelete>
-                          ),
-                });
+                if (row.status === 1) {
+                    menuArr.push({
+                        key:  'delete',
+                        name: (
+                                  <ConfirmDelete
+                                      key={'delete'}
+                                      url="/admin/position"
+                                      id_arr={[row.id]}
+                                      onConfirm={() => {
+                                          actionRef.current?.reload();
+                                          clearSelected();
+                                      }}
+                                  >
+                                      <span>删除</span>
+                                  </ConfirmDelete>
+                              ),
+                    });
+                }
                 let jsx: ReactNode | null = null;
                 if (menuArr.length === 1) {
                     jsx = menuArr[0].name;
@@ -137,34 +144,38 @@ const AdminPosition: React.FC = () => {
         <>
             <Form visit={visit} onCancel={cancel} onFinish={formFinish}/>
             <TablePage
-                tableAlertRender={({selectedRowKeys}) => {
+                alertRender={(selectType, {selectedRowKeys}) => {
                     return [
-                        <ConfirmDelete
-                            key="deleteAction"
-                            id_arr={selectedRowKeys as number[]}
-                            url="/admin/position"
-                            onConfirm={() => {
-                                (actionRef as React.MutableRefObject<ActionType>).current?.reload();
-                                clearSelected();
-                            }}
-                        >
-                            <a>删除</a>
-                        </ConfirmDelete>,
                         (
+                            selectType === 'new' &&
+                            <ConfirmDelete
+                                key="deleteAction"
+                                id_arr={selectedRowKeys as number[]}
+                                url="/admin/position"
+                                onConfirm={() => {
+                                    (actionRef as React.MutableRefObject<ActionType>).current?.reload();
+                                    clearSelected();
+                                }}
+                            >
+                                <a>删除</a>
+                            </ConfirmDelete>
+                        ),
+                        (
+                            selectType === 'old' &&
                             <ConfirmStatus
                                 key="status"
                                 optionArr={[
                                     {
                                         label: '启用',
-                                        value: 1,
-                                    },
-                                    {
-                                        label: '停用',
                                         value: 2,
                                     },
                                     {
-                                        label: '锁定',
+                                        label: '异常',
                                         value: 3,
+                                    },
+                                    {
+                                        label: '停用',
+                                        value: 4,
                                     },
                                 ]}
                                 onConfirm={(value) => {
@@ -199,35 +210,7 @@ const AdminPosition: React.FC = () => {
                 columns={columns}
                 setVisit={setVisit}
                 selectedClear={clearSelected}
-                request={async (...params) => {
-                    console.log('log1 ', ...params);
-                    let paramsAfter: any = packQuery(...params);
-                    console.log('log2 ', paramsAfter);
-                    return request('/api/admin/position/list', {method: 'POST', data: paramsAfter,})
-                        .then(
-                            ({status, data, admin_department_outline: outlineArr}: {
-                                status: number;
-                                data: Row[];
-                                admin_department_outline: PositionOutline[]
-                            }) => {
-                                if (status === 200 && Boolean(data)) {
-                                    if (Boolean(outlineArr)) {
-                                        for (let i = 0; i < data.length; i++) {
-                                            let row = data[i];
-                                            for (let j = 0; j < outlineArr.length; j++) {
-                                                const outline = outlineArr[j];
-                                                if (outline.id === row.admin_department_id) {
-                                                    row.admin_department_name = outline.name;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    return {status, data};
-                                }
-                                return {status};
-                            }
-                        )
-                }}
+                path={'/api/admin/position/list'}
             />
         </>
     );

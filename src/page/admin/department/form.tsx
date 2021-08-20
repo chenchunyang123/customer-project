@@ -1,14 +1,14 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ProForm, {
     FormInstance,
     ModalForm,
     ProFormSelect,
     ProFormText,
     ProFormTextArea,
-}                                 from '@ant-design/pro-form';
-import request                    from 'umi-request';
-import {message}                  from 'antd';
-import {Visit}                    from '@/global';
+}                                           from '@ant-design/pro-form';
+import request                              from 'umi-request';
+import {message}                            from 'antd';
+import {Visit}                              from '@/global';
 
 interface Props {
     visit: Visit;
@@ -18,12 +18,14 @@ interface Props {
 
 const Detail: React.FC<Props> = (props) => {
     const formRef = useRef<FormInstance>();
+    const [status, setStatus] = useState<number>(1);
     useEffect(() => {
         if (
             (props.visit.id > 0 && props.visit.action === 'update') ||
             (props.visit.id === 0 && props.visit.action === 'create')
         ) {
             formRef.current?.resetFields();
+            setStatus(1);
             if (props.visit.id > 0 && props.visit.action === 'update') {
                 request('/api/admin/department/' + props.visit.id, {method: 'POST'}).then(
                     ({status: resStatus, data}) => {
@@ -31,6 +33,7 @@ const Detail: React.FC<Props> = (props) => {
                         if (resStatus === 200) {
                             const {status, id, name, description} =
                                       data;
+                            setStatus(status);
                             formRef.current?.setFieldsValue({
                                 id,
                                 status,
@@ -79,11 +82,18 @@ const Detail: React.FC<Props> = (props) => {
                     required
                     label="启用状态"
                     name="status"
-                    options={[
-                        {label: '使用中', value: 2},
-                        {label: '异常', value: 3},
-                        {label: '停用', value: 4},
-                    ]}
+                    disabled={props.visit.id === 0 || status === 1}
+                    options={
+                        status === 1 ?
+                        [
+                            {label: '新数据', value: 1}
+                        ] :
+                        [
+                            {label: '使用中', value: 2},
+                            {label: '异常', value: 3},
+                            {label: '停用', value: 4},
+                        ]
+                    }
                 />
             </ProForm.Group>
             <ProForm.Group label="基本信息">

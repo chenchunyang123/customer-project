@@ -4,7 +4,7 @@ export const ColumnStatus: ProColumns = {
     title:     '状态',
     sorter:    true,
     dataIndex: 'status',
-    valueType: 'select',
+    valueType: 'checkbox',
     valueEnum: {
         1: {
             text:   '新数据',
@@ -27,8 +27,10 @@ export const ColumnStatus: ProColumns = {
 
 export const ColumnSTATUS: ProColumns = {
     ...ColumnStatus,
-    width: 70,
-    fixed: 'left',
+    initialValue: [1, 2, 3],
+    order:        10,
+    width:        70,
+    fixed:        'left',
 };
 
 export const ColumnId: ProColumns = {
@@ -57,13 +59,12 @@ const createdAt1: ProColumns = {
 const createdAt2: ProColumns = {
     title:       '创建时间',
     dataIndex:   'created_at',
-    valueType:   'dateRange',
+    valueType:   'dateTimeRange',
     filters:     true,
     hideInTable: true,
     search:      {
         transform: (value) => ({
-            created_at_start: value[0],
-            created_at_end:   value[1],
+            created_at: value,
         }),
     },
 };
@@ -81,13 +82,12 @@ const updatedAt1: ProColumns = {
 const updatedAt2: ProColumns = {
     title:       '更新时间',
     dataIndex:   'updated_at',
-    valueType:   'dateRange',
+    valueType:   'dateTimeRange',
     filters:     true,
     hideInTable: true,
     search:      {
         transform: (value) => ({
-            updated_at_start: value[0],
-            updated_at_end:   value[1],
+            updated_at: value,
         }),
     },
 };

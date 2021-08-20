@@ -3,7 +3,7 @@ import {ValueType} from "@/pack/searchSelect";
 import React       from "react";
 
 export const HintMenu = (val: string) => {
-    return request('/api/admin/menu/hint', {method: 'POST', data: {input: val}})
+    return request('/api/auth/hint', {method: 'POST', data: {input: val}})
         .then(
             ({status, data}) => {
                 let arr: ValueType[] = [];

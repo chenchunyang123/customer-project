@@ -49,6 +49,8 @@ interface MenuGroupOutline {
 
 }
 
+type SelectType = 'new' | 'old' | null;
+
 interface DepartmentOutline {
     id: number;
     e_id: number;

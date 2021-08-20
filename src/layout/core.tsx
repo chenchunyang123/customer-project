@@ -48,14 +48,6 @@ const Core: React.FC = () => {
                             管理员岗位
                         </Menu.Item>
                     </SubMenu>
-                    <SubMenu level={1} key={'/audit'} icon={<PartitionOutlined/>} title={'审核流转'}>
-                        <Menu.Item onClick={() => history.push('/admin/user')}>
-                            构建流程
-                        </Menu.Item>
-                        <Menu.Item onClick={() => history.push('/admin/department')}>
-                            审核日志
-                        </Menu.Item>
-                    </SubMenu>
                 </Menu>
             </Layout.Sider>
             <Layout className={css.right}>
@@ -110,7 +102,7 @@ const Core: React.FC = () => {
                                 type="link"
                                 danger
                                 onClick={async () => {
-                                    await request('/api/logout', {
+                                    await request('/api/auth/logout', {
                                         method: 'POST',
                                     });
                                     localStorage.clear();

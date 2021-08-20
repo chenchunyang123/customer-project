@@ -29,7 +29,7 @@ const Login: React.FC = () => {
     const onFinish = useCallback(
         (formData) => {
             setLoading(true);
-            return request('/api/login', {data: formData, method: 'POST'}).then(
+            return request('/api/auth/login', {data: formData, method: 'POST'}).then(
                 ({status, data}) => {
                     if (status === 200) {
                         message.success('登录成功, 即将跳转');
@@ -133,7 +133,7 @@ const Login: React.FC = () => {
                 ]}
                 placeholder="请输入验证码"
                 onGetCaptcha={async (phone) => {
-                await request('/api/login/captcha', {
+                await request('/api/auth/login/captcha', {
                     method: 'POST',
                     data:   {phone},
                 }).then(({status}) => {

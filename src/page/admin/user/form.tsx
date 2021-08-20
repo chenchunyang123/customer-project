@@ -19,6 +19,7 @@ interface Props {
 
 const Detail: React.FC<Props> = (props) => {
     const formRef = useRef<FormInstance>();
+    const [status, setStatus] = useState<number>(1);
     const [departmentIdOutlineMap, setDepartmentIdOutlineMap] = useState<DepartmentIdOutlineMap>({});
     const [positionOutlineArr, setPositionOutlineArr] = useState<PositionOutline[]>([]);
     const [departmentIdPositionIdMap, setDepartmentIdPositionIdMap] = useState<DepartmentIdPositionIdMap>({});
@@ -28,115 +29,94 @@ const Detail: React.FC<Props> = (props) => {
             (props.visit.id === 0 && props.visit.action === 'create')
         ) {
             formRef.current?.resetFields();
+            setStatus(1);
             setDepartmentIdPositionIdMap({});
-            new Promise(
-                (resolve, reject) => {
-                    if (positionOutlineArr.length === 0) {
-                        request('/api/admin/position/outline', {method: 'POST'}).then(
-                            ({status, data: positionOutlineArr = []}: {
-                                data: PositionOutline[];
-                                status: number;
-                            }) => {
-                                if (status === 200) {
-                                    request('/api/admin/department/outline', {method: 'POST'})
-                                        .then(
-                                            ({status, data: departmentOutlineArr = []}: {
-                                                data: DepartmentOutline[];
-                                                status: number;
-                                            }) => {
-                                                if (status === 200) {
-                                                    let newDepartmentIdOutlineMap: DepartmentIdOutlineMap = {};
-                                                    for (let i = 0; i < departmentOutlineArr.length; i++) {
-                                                        const departmentOutline = departmentOutlineArr[i];
-                                                        newDepartmentIdOutlineMap[departmentOutline.id] = departmentOutline;
-                                                    }
-                                                    let departmentIdPositionOutlineArrMap: DepartmentIdPositionOutlineArrMap = {};
-                                                    for (let i = 0; i < positionOutlineArr.length; i++) {
-                                                        const positionOutline = positionOutlineArr[i];
-                                                        let usedPositionOutlineArr = departmentIdPositionOutlineArrMap[positionOutline.admin_department_id];
-                                                        if (usedPositionOutlineArr !== undefined) {
-                                                            usedPositionOutlineArr[0].span += 1;
-                                                            positionOutline.span = 0;
-                                                            usedPositionOutlineArr.push(positionOutline);
-                                                        } else {
-                                                            positionOutline.span = 1;
-                                                            departmentIdPositionOutlineArrMap[positionOutline.admin_department_id] = [positionOutline];
-                                                        }
-                                                    }
-                                                    let newPositionOutline = [];
-                                                    for (let departmentId in departmentIdPositionOutlineArrMap) {
-                                                        newPositionOutline.push(...departmentIdPositionOutlineArrMap[departmentId]);
-                                                    }
-                                                    setDepartmentIdOutlineMap(newDepartmentIdOutlineMap);
-                                                    setPositionOutlineArr(newPositionOutline);
-                                                    console.log('log1 ', newPositionOutline);
-                                                    console.log('log2 ', newDepartmentIdOutlineMap);
-                                                }
-                                            }
-                                        )
+            request('/api/admin/user/' + props.visit.id, {method: 'POST'}).then(
+                ({
+                     data,
+                     status:                       resStatus,
+                     admin_position_outline_arr:   {data: positionOutlineArr},
+                     admin_department_outline_arr: {data: departmentOutlineArr}
+                 }) => {
+                    formRef.current?.resetFields();
+                    new Promise<PositionOutline[]>(
+                        resolve => {
+                            if (resStatus > 202) {
+                                message.error('服务器请求出错');
+                                return
+                            }
+                            let newDepartmentIdOutlineMap: DepartmentIdOutlineMap = {};
+                            for (let i = 0; i < departmentOutlineArr.length; i++) {
+                                const departmentOutline = departmentOutlineArr[i];
+                                newDepartmentIdOutlineMap[departmentOutline.id] = departmentOutline;
+                            }
+                            let departmentIdPositionOutlineArrMap: DepartmentIdPositionOutlineArrMap = {};
+                            for (let i = 0; i < positionOutlineArr.length; i++) {
+                                const positionOutline = positionOutlineArr[i];
+                                let usedPositionOutlineArr = departmentIdPositionOutlineArrMap[positionOutline.admin_department_id];
+                                if (usedPositionOutlineArr !== undefined) {
+                                    usedPositionOutlineArr[0].span += 1;
+                                    positionOutline.span = 0;
+                                    usedPositionOutlineArr.push(positionOutline);
                                 } else {
-                                    message.error('获取服务器数据出错');
-                                    reject([]);
+                                    positionOutline.span = 1;
+                                    departmentIdPositionOutlineArrMap[positionOutline.admin_department_id] = [positionOutline];
                                 }
-                            },
-                        );
-                    } else {
-                        resolve(positionOutlineArr);
-                    }
-                }
-            )
-                .then(
-                    (nextPositionOutlineArr) => {
-                        if (props.visit.id > 0 && props.visit.action === 'update') {
-                            request('/api/admin/user/' + props.visit.id, {method: 'POST'}).then(
-                                ({status: resStatus, data}) => {
-                                    formRef.current?.resetFields();
-                                    if (resStatus === 200) {
-                                        const {
-                                                  status,
-                                                  id,
-                                                  code,
-                                                  phone,
-                                                  email,
-                                                  real_name,
-                                                  nick_name,
-                                                  sex,
-                                                  birth_at,
-                                                  admin_position_id_arr,
-                                              } = data;
-                                        if (admin_position_id_arr !== null) {
-                                            let newDepartmentIdPositionOutlineMap: DepartmentIdPositionIdMap = {};
-                                            const idArr = admin_position_id_arr as number[];
-                                            const arr = nextPositionOutlineArr as PositionOutline[];
-                                            for (let i = 0; i < arr.length; i++) {
-                                                if (idArr.indexOf(arr[i].id) !== -1) {
-                                                    newDepartmentIdPositionOutlineMap[arr[i].admin_department_id] = arr[i].id;
-                                                }
-                                            }
-                                            setDepartmentIdPositionIdMap(newDepartmentIdPositionOutlineMap);
-                                            console.log('log[ref]: ', newDepartmentIdPositionOutlineMap,);
-                                        } else {
-                                            setDepartmentIdPositionIdMap({});
-                                        }
-                                        formRef.current?.setFieldsValue({
-                                            id,
-                                            status,
-                                            nick_name,
-                                            real_name,
-                                            email,
-                                            phone,
-                                            code,
-                                            sex,
-                                            birth_at,
-                                        });
-                                    } else {
-                                        message.error('服务器请求出错');
-                                    }
-                                },
-                            );
+                            }
+                            let newPositionOutline = [];
+                            for (let departmentId in departmentIdPositionOutlineArrMap) {
+                                newPositionOutline.push(...departmentIdPositionOutlineArrMap[departmentId]);
+                            }
+                            setDepartmentIdOutlineMap(newDepartmentIdOutlineMap);
+                            setPositionOutlineArr(newPositionOutline);
+                            console.log('log1 ', newPositionOutline);
+                            console.log('log2 ', newDepartmentIdOutlineMap);
+                            resolve(newPositionOutline);
                         }
-                    }
-                )
+                    ).then(
+                        (nextPositionOutlineArr) => {
+                            if (data) {
+                                const {
+                                          status,
+                                          id,
+                                          code,
+                                          phone,
+                                          email,
+                                          real_name,
+                                          nick_name,
+                                          sex,
+                                          birth_at,
+                                          admin_position_id_arr,
+                                      } = data;
+                                formRef.current?.setFieldsValue({
+                                    id,
+                                    status,
+                                    nick_name,
+                                    real_name,
+                                    email,
+                                    phone,
+                                    code,
+                                    sex,
+                                    birth_at,
+                                });
+                                setStatus(status);
+                                if (admin_position_id_arr !== null) {
+                                    let newDepartmentIdPositionOutlineMap: DepartmentIdPositionIdMap = {};
+                                    for (let i = 0; i < nextPositionOutlineArr.length; i++) {
+                                        if (admin_position_id_arr.indexOf(nextPositionOutlineArr[i].id) !== -1) {
+                                            newDepartmentIdPositionOutlineMap[nextPositionOutlineArr[i].admin_department_id] = nextPositionOutlineArr[i].id;
+                                        }
+                                    }
+                                    setDepartmentIdPositionIdMap(newDepartmentIdPositionOutlineMap);
+                                    console.log('log[ref]: ', newDepartmentIdPositionOutlineMap,);
+                                } else {
+                                    setDepartmentIdPositionIdMap({});
+                                }
+                            }
+                        }
+                    )
+                },
+            );
         }
     }, [props.visit.id]);
     const departmentPositionColumnArr: TableColumnProps<PositionOutline>[] =
@@ -253,14 +233,21 @@ const Detail: React.FC<Props> = (props) => {
                     <ProForm.Group label="选项">
                         <ProFormSelect
                             required
+                            disabled={props.visit.id === 0 || status === 1}
                             name="status"
                             label="管理员启用状态"
                             width={200}
-                            options={[
-                                {label: '使用中', value: 2},
-                                {label: '异常', value: 3},
-                                {label: '停用', value: 4},
-                            ]}
+                            options={
+                                status === 1 ?
+                                [
+                                    {label: '新数据', value: 1},
+                                ] :
+                                [
+                                    {label: '使用中', value: 2},
+                                    {label: '异常', value: 3},
+                                    {label: '停用', value: 4},
+                                ]
+                            }
                         />
                     </ProForm.Group>
                     <ProForm.Group label="基本信息">
@@ -317,6 +304,7 @@ const Detail: React.FC<Props> = (props) => {
                             ]}
                         />
                         <ProFormDatePicker
+                            required
                             label="生日"
                             width={200}
                             name="birth_at"

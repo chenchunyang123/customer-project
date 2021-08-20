@@ -57,9 +57,10 @@ const AdminUser: React.FC = () => {
         {
             title:     '邮箱地址',
             dataIndex: 'email',
-            width:     140,
+            width:     180,
+            ellipsis:  true,
             render:    (val, row) => (
-                <div dangerouslySetInnerHTML={{__html: row.email}}/>
+                <div className={'search'} dangerouslySetInnerHTML={{__html: row.email}}/>
             )
         },
         {
@@ -104,7 +105,7 @@ const AdminUser: React.FC = () => {
         {
             title:     '性别',
             dataIndex: 'sex',
-            valueType: 'checkbox',
+            valueType: 'radio',
             order:     0,
             width:     50,
             valueEnum: {
@@ -134,22 +135,24 @@ const AdminUser: React.FC = () => {
             valueType: 'option',
             render:    (_, row) => {
                 let menuArr: ActionMenuItem[] = [];
-                menuArr.push({
-                    key:  'delete',
-                    name: (
-                              <ConfirmDelete
-                                  key={'delete'}
-                                  url="/admin/user"
-                                  id_arr={[row.id]}
-                                  onConfirm={() => {
-                                      actionRef.current?.reload();
-                                      clearSelected();
-                                  }}
-                              >
-                                  <span>删除</span>
-                              </ConfirmDelete>
-                          ),
-                });
+                if (row.status === 1) {
+                    menuArr.push({
+                        key:  'delete',
+                        name: (
+                                  <ConfirmDelete
+                                      key={'delete'}
+                                      url="/admin/user"
+                                      id_arr={[row.id]}
+                                      onConfirm={() => {
+                                          actionRef.current?.reload();
+                                          clearSelected();
+                                      }}
+                                  >
+                                      <span>删除</span>
+                                  </ConfirmDelete>
+                              ),
+                    });
+                }
                 let jsx: ReactNode | null = null;
                 if (menuArr.length === 1) {
                     jsx = menuArr[0].name;
@@ -180,6 +183,7 @@ const AdminUser: React.FC = () => {
             id:     -1,
             action: 'detail',
         });
+        clearSelected();
     }, []);
     const formFinish = useCallback(
         (data: any) => {
@@ -190,7 +194,7 @@ const AdminUser: React.FC = () => {
                 method = 'PUT';
             }
             return request(path, {method, data}).then((res) => {
-                if (res.status === 200) {
+                if (res.status < 202) {
                     message.success('编辑成功');
                     cancel();
                     actionRef.current?.reload();
@@ -207,34 +211,38 @@ const AdminUser: React.FC = () => {
         <>
             <Form visit={visit} onCancel={cancel} onFinish={formFinish}/>
             <TablePage
-                tableAlertRender={({selectedRowKeys}) => {
+                alertRender={(selectType, {selectedRowKeys}) => {
                     return [
-                        <ConfirmDelete
-                            key="deleteAction"
-                            id_arr={selectedRowKeys as number[]}
-                            url="/admin/user"
-                            onConfirm={() => {
-                                (actionRef as React.MutableRefObject<ActionType>).current?.reload();
-                                clearSelected();
-                            }}
-                        >
-                            <a>删除</a>
-                        </ConfirmDelete>,
                         (
+                            selectType === 'new' &&
+                            <ConfirmDelete
+                                key="deleteAction"
+                                id_arr={selectedRowKeys as number[]}
+                                url="/admin/user"
+                                onConfirm={() => {
+                                    (actionRef as React.MutableRefObject<ActionType>).current?.reload();
+                                    clearSelected();
+                                }}
+                            >
+                                <a>删除(仅新数据)</a>
+                            </ConfirmDelete>
+                        ),
+                        (
+                            selectType === 'old' &&
                             <ConfirmStatus
                                 key="status"
                                 optionArr={[
                                     {
                                         label: '启用',
-                                        value: 1,
-                                    },
-                                    {
-                                        label: '停用',
                                         value: 2,
                                     },
                                     {
-                                        label: '锁定',
+                                        label: '异常',
                                         value: 3,
+                                    },
+                                    {
+                                        label: '停用',
+                                        value: 4,
                                     },
                                 ]}
                                 onConfirm={(value) => {
@@ -265,7 +273,7 @@ const AdminUser: React.FC = () => {
                         </Button>
                     ),
                 ]}
-                scroll={{x: 1700, y: 400}}
+                scroll={{x: 1800, y: 400}}
                 columns={columns}
                 setVisit={setVisit}
                 path={'/api/admin/user/list'}
