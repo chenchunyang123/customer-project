@@ -45,6 +45,7 @@ const SearchSelect: React.FC<SearchPageProps<ValueType>> = ({fetchOptionArr, at 
         <Select<ValueType>
             labelInValue
             showSearch
+            onSelect={e => console.log(e)}
             filterOption={false}
             onSearch={run}
             notFoundContent={fetching ? <Spin size="small"/> : null}
