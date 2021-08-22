@@ -30,7 +30,7 @@ const App: React.FC = (props) => {
         }
     }, []);
     const pipeSetUserinfo = useCallback((info: UserinfoType) => {
-        window.location.href = '/';
+        // window.location.href = '/';
         window.localStorage.setItem(
             STORE_USERINFO,
             JSON.stringify(info),

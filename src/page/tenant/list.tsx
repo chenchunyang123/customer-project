@@ -1,4 +1,4 @@
-import React, {useRef, useCallback, ReactNode}                    from 'react';
+import React, {useRef, useCallback, ReactNode, useContext}        from 'react';
 import {useState}                                                 from 'react';
 import request                                                    from 'umi-request';
 import {ActionType, ProColumns, TableDropdown}                    from '@ant-design/pro-table';
@@ -9,7 +9,8 @@ import ConfirmStatus                                              from '@/pack/c
 import {ActionMenuItem, Visit}                                    from "@/global";
 import {ColumnCreatedAt, ColumnId, ColumnStatus, ColumnUpdatedAt} from "@/word/enum";
 import TablePage                                                  from "@/pack/tablePage";
-import {PlusSquareTwoTone}                                        from "@ant-design/icons";
+import {PlusSquareTwoTone, SyncOutlined}                          from "@ant-design/icons";
+import {UserinfoContext}                                          from "@/word/state";
 
 interface Row {
     id: number;
@@ -30,6 +31,7 @@ const Tenant: React.FC = () => {
         action: 'detail',
     });
     const actionRef = useRef<ActionType>();
+    const userinfo = useContext(UserinfoContext);
     const clearSelected = () => {
         ((actionRef.current as any as ActionType).clearSelected as any)();
     };
@@ -79,6 +81,39 @@ const Tenant: React.FC = () => {
             valueType: 'option',
             render:    (_, row) => {
                 let menuArr: ActionMenuItem[] = [];
+                menuArr.push({
+                    key:  'lock',
+                    name: (
+                              <>
+                                  {
+                                      userinfo.userinfo.prv_id === row.id ?
+                                      <div className={'disabled-link'}>
+                                          <SyncOutlined spin/> 当前租户
+                                      </div> :
+                                      <a
+                                          onClick={() => {
+                                              request('/api/tenant/lock/' + row.id, {method: 'POST'})
+                                                  .then(
+                                                      ({status}) => {
+                                                          if (status === 200) {
+                                                              userinfo.setUserinfo({
+                                                                  ...userinfo.userinfo,
+                                                                  tenant_name:   row.name,
+                                                                  tenant_status: row.status,
+                                                                  prv_id:        row.id,
+                                                              });
+                                                          }
+                                                      }
+                                                  )
+                                          }}
+                                      >
+                                          切换租户
+                                      </a>
+                                  }
+                              </>
+
+                          )
+                });
                 if (row.status === 1) {
                     menuArr.push({
                         key:  'delete',
@@ -161,7 +196,7 @@ const Tenant: React.FC = () => {
                             <ConfirmDelete
                                 key="deleteAction"
                                 id_arr={selectedRowKeys as number[]}
-                                url="/tenant"
+                                url="/tenant/1"
                                 onConfirm={() => {
                                     (actionRef as React.MutableRefObject<ActionType>).current?.reload();
                                     clearSelected();
@@ -188,7 +223,7 @@ const Tenant: React.FC = () => {
                                     },
                                 ]}
                                 onConfirm={(value) => {
-                                    request(`/api/tenant/status/${value}`, {
+                                    request(`/api/tenant/status/1/${value}`, {
                                         method: 'POST',
                                         data:   {id_arr: selectedRowKeys},
                                     }).then(({status}) => {

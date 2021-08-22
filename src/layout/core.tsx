@@ -1,17 +1,17 @@
-import React, {useContext, useState}                                                                              from "react";
-import {Avatar, Button, Layout, Menu, Typography}                                                                 from "antd";
-import {HomeOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
-import css                                                                                                        from './core.module.less';
-import used                                                                                                       from "@/word/used";
-import {UserinfoContext}                                                                                          from "@/word/state";
-import {Route, Switch, useHistory}                                                                                from "react-router-dom";
-import request                                                                                                    from "umi-request";
-import SearchSelect                                                                                               from "@/pack/searchSelect";
-import {HintMenu}                                                                                                 from "@/word/hint";
-import AdminUser                                                                                                  from "@/page/admin/user/list";
-import AdminDepartment                                                                                            from "@/page/admin/department/list";
-import AdminPosition                                                                                              from "@/page/admin/position/list";
-import Tenant                                                                                                     from "@/page/tenant/list";
+import React, {useContext, useState}                                                                                            from "react";
+import {Avatar, Button, Layout, Menu, Tag, Typography}                                                                          from "antd";
+import {HomeOutlined, LockOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
+import css                                                                                                                      from './core.module.less';
+import used                                                                                                                     from "@/word/used";
+import {UserinfoContext}                                                                                                        from "@/word/state";
+import {Route, Switch, useHistory}                                                                                              from "react-router-dom";
+import request                                                                                                                  from "umi-request";
+import SearchSelect                                                                                                             from "@/pack/searchSelect";
+import {HintMenu}                                                                                                               from "@/word/hint";
+import AdminUser                                                                                                                from "@/page/admin/user/list";
+import AdminDepartment                                                                                                          from "@/page/admin/department/list";
+import AdminPosition                                                                                                            from "@/page/admin/position/list";
+import Tenant                                                                                                                   from "@/page/tenant/list";
 
 const {SubMenu} = Menu;
 
@@ -97,6 +97,20 @@ const Core: React.FC = () => {
                                     history.push(value.value as string);
                                 }}
                             />
+                            {
+                                userinfo.userinfo.prv_id > 1 &&
+                                <Tag color={
+                                    userinfo.userinfo.tenant_status === 1 ?
+                                    '#52c41a' :
+                                    userinfo.userinfo.tenant_status === 2 ?
+                                    '#1890ff' :
+                                    userinfo.userinfo.tenant_status === 3 ?
+                                    '#cd201f' :
+                                    '#c8c8c8'
+                                } icon={<LockOutlined/>} className={css.tenant_tag}>
+                                    {userinfo.userinfo.tenant_name}
+                                </Tag>
+                            }
                         </div>
                         <div className={css.right}>
                             <Button

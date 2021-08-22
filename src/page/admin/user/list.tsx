@@ -43,7 +43,7 @@ const AdminUser: React.FC = () => {
             title:     '头像',
             dataIndex: 'avatar',
             width:     60,
-            render:    (_, row) => <Avatar src={used.s3_api + row.avatar}/>,
+            render:    (_, row) => <Avatar src={used.s3_api + used.s3_prefix_avatar + '/' + row.avatar}/>,
         },
         {
             title:     '手机号',

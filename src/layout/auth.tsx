@@ -41,13 +41,15 @@ const Login: React.FC = () => {
                         );
                         if (status === 200) {
                             ctx.setUserinfo({
-                                u_id:            userinfo.id,
-                                prv_id:          userinfo.prv_id,
-                                phone:           userinfo.phone,
-                                avatar:          userinfo.avatar,
-                                nick_name:       userinfo.nick_name,
-                                enterprise_name: userinfo.enterprise_name,
+                                u_id:          userinfo.id,
+                                prv_id:        userinfo.prv_id,
+                                phone:         userinfo.phone,
+                                avatar:        userinfo.avatar,
+                                nick_name:     userinfo.nick_name,
+                                tenant_status: userinfo.tenant_status,
+                                tenant_name:   userinfo.tenant_name,
                             });
+                            window.location.href = '/';
                         }
                     }
                     setLoading(false);
@@ -133,17 +135,17 @@ const Login: React.FC = () => {
                 ]}
                 placeholder="请输入验证码"
                 onGetCaptcha={async (phone) => {
-                await request('/api/auth/login/captcha', {
-                    method: 'POST',
-                    data:   {phone},
-                }).then(({status}) => {
-                    if (status === 200) {
-                        message.success(`手机号 ${phone} 验证码发送成功!`);
-                    } else {
-                        message.error(`短信发送失败`);
-                        throw status;
-                    }
-                });
+                    await request('/api/auth/login/captcha', {
+                        method: 'POST',
+                        data:   {phone},
+                    }).then(({status}) => {
+                        if (status === 200) {
+                            message.success(`手机号 ${phone} 验证码发送成功!`);
+                        } else {
+                            message.error(`短信发送失败`);
+                            throw status;
+                        }
+                    });
                 }}
             />
             <div className={css.links}>
