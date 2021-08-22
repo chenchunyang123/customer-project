@@ -79,7 +79,7 @@ const Detail: React.FC<Props> = (props) => {
                             if (license) {
                                 licenseItem.push({
                                     uid:    '1',
-                                    name:   'license',
+                                    name:   license,
                                     status: 'done',
                                     url:    used.s3_api + used.s3_prefix_license + license,
                                 });
@@ -89,7 +89,7 @@ const Detail: React.FC<Props> = (props) => {
                                 for (let i = 0; i < license_any.length; i++) {
                                     licenseAnyItem.push({
                                         uid:    i.toString(),
-                                        name:   'license_any_' + i,
+                                        name:   license_any[i],
                                         status: 'done',
                                         url:    used.s3_api + used.s3_prefix_license_any + license_any[i],
                                     });
@@ -161,6 +161,20 @@ const Detail: React.FC<Props> = (props) => {
                 }
                 payload['district_name'] = districtNames;
                 payload['district_id_arr'] = districtIdArr;
+                if (payload['license_any'].length < 1) {
+                    delete payload['license_any'];
+                } else {
+                    let licenseAny: string[] = [];
+                    for (let i = 0; i < payload['license_any'].length; i++) {
+                        licenseAny.push(payload['license_any'][i].name);
+                    }
+                    payload['license_any'] = licenseAny;
+                }
+                if (payload['license'].length < 1) {
+                    message.warn('请上传营业许可证');
+                    throw '请上传营业许可证';
+                }
+                payload['license'] = payload['license'][0]['name'];
                 return props.onFinish(payload);
             }}
         >
