@@ -41,7 +41,11 @@ export const loadDistrictNext = (options: CascaderOptionType[]) => {
 export const initDistrict = async (idArr: number[]): Promise<CascaderOptionType[]> => {
     let lastDistrictArr: CascaderOptionType[] = [];
     idArr = [100000, ...idArr];
-    for (let i = idArr.length - 2; i > -1; i--) {
+    let i = idArr.length - 2;
+    if (i === -1) {
+        i = i + 1;
+    }
+    for (; i > -1; i--) {
         await request(used.ali_map + '&keywords=' + idArr[i])
             .then(
                 ({districts}) => {

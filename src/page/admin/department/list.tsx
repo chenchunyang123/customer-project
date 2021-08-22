@@ -1,15 +1,17 @@
-import React, {useRef, useCallback, ReactNode}                    from 'react';
-import {useState}                                                 from 'react';
-import request                                                    from 'umi-request';
-import {ActionType, ProColumns, TableDropdown}                    from '@ant-design/pro-table';
-import {Button, message}                                          from 'antd';
-import Form                                                       from './form';
-import ConfirmDelete                                              from '@/pack/confirmDelete';
-import ConfirmStatus                                              from '@/pack/confirmStatus';
-import {ActionMenuItem, Visit}                                    from "@/global";
-import {ColumnCreatedAt, ColumnId, ColumnStatus, ColumnUpdatedAt} from "@/word/enum";
-import TablePage                                                  from "@/pack/tablePage";
-import {PlusSquareTwoTone}                                        from "@ant-design/icons";
+import React, {useRef, useCallback, ReactNode, useContext}                                          from 'react';
+import {useState}                                                                                   from 'react';
+import request                                                                                      from 'umi-request';
+import {ActionType, ProColumns, TableDropdown}                                                      from '@ant-design/pro-table';
+import {Button, message}                                                                            from 'antd';
+import Form                                                                                         from './form';
+import ConfirmDelete                                                                                from '@/pack/confirmDelete';
+import ConfirmStatus                                                                                from '@/pack/confirmStatus';
+import {ActionMenuItem, Visit}                                                                      from "@/global";
+import {ColumnCreatedAt, ColumnId, ColumnStatus, ColumnUpdatedAt}                                   from "@/word/enum";
+import TablePage                                                                                    from "@/pack/tablePage";
+import {PlusSquareTwoTone}                                                                          from "@ant-design/icons";
+import {AdminDepartmentCreate, AdminDepartmentUpdate, AdminDepartmentDelete, AdminDepartmentStatus} from "@/word/const";
+import {CanContext}                                                                                 from "@/word/state";
 
 interface Row {
     id: number;
@@ -26,6 +28,7 @@ const AdminDepartment: React.FC = () => {
         action: 'detail',
     });
     const actionRef = useRef<ActionType>();
+    const can = useContext(CanContext);
     const clearSelected = () => {
         ((actionRef.current as any as ActionType).clearSelected as any)();
     };
@@ -53,7 +56,7 @@ const AdminDepartment: React.FC = () => {
             valueType: 'option',
             render:    (_, row) => {
                 let menuArr: ActionMenuItem[] = [];
-                if (row.status === 1) {
+                if (row.status === 1 && can[AdminDepartmentDelete]) {
                     menuArr.push({
                         key:  'delete',
                         name: (
@@ -79,6 +82,7 @@ const AdminDepartment: React.FC = () => {
                 }
                 return [
                     (
+                        can[AdminDepartmentUpdate] &&
                         <a
                             key="update"
                             onClick={() => {
@@ -179,6 +183,7 @@ const AdminDepartment: React.FC = () => {
                 actionRef={actionRef}
                 toolBarRender={() => [
                     (
+                        can[AdminDepartmentCreate] &&
                         <Button
                             icon={<PlusSquareTwoTone/>}
                             onClick={() =>
@@ -194,6 +199,20 @@ const AdminDepartment: React.FC = () => {
                 setVisit={setVisit}
                 path={'/api/admin/department/list'}
                 selectedClear={clearSelected}
+                canSelection={(row: any) => (
+                    (
+                        row.status === 1 &&
+                        (
+                            !can[AdminDepartmentDelete]
+                        )
+                    ) ||
+                    (
+                        row.status !== 1 &&
+                        (
+                            !can[AdminDepartmentStatus]
+                        )
+                    )
+                )}
             />
         </>
     );

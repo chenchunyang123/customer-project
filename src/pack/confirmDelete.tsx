@@ -24,7 +24,7 @@ const ConfirmDelete: React.FC<Props> = (props) => {
     }, [props.id_arr]);
     return (
         <Popconfirm title="请再次确定删除" onConfirm={delRoleArr}>
-            <a style={{marginRight: 20}}>删除</a>
+            <a>删除</a>
         </Popconfirm>
     );
 };

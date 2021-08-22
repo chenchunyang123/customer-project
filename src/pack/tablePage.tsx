@@ -9,6 +9,7 @@ interface TablePageProps extends ProTableProps<any, any, any> {
     selectedClear: () => void;
     setVisit: (visit: Visit) => void;
     path?: string;
+    canSelection?: (row: any, selectType: SelectType) => boolean;
     alertRender: (selectType: SelectType, props: {
         intl: IntlType;
         selectedRowKeys: (number | string)[];
@@ -37,9 +38,13 @@ const TablePage: React.FC<TablePageProps> = (props) => {
                         }
                     }
                 }),
-                getCheckboxProps: (row) => ({
-                    disabled: selectType !== null && (row.status !== 1 ? selectType === 'new' : selectType === 'old')
-                })
+                getCheckboxProps: (row) => {
+                    let check = false;
+                    if (props.canSelection) {
+                        check = props.canSelection(row, selectType);
+                    }
+                    return {disabled: (selectType !== null && (row.status !== 1 ? selectType === 'new' : selectType === 'old')) || check};
+                }
             }}
             {...props}
             key={'id'}

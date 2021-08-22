@@ -1,11 +1,12 @@
 import {ProColumns} from '@ant-design/pro-table';
 
 export const ColumnStatus: ProColumns = {
-    title:     '状态',
-    sorter:    true,
-    dataIndex: 'status',
-    valueType: 'checkbox',
-    valueEnum: {
+    title:        '状态',
+    sorter:       true,
+    initialValue: [1, 2, 3],
+    dataIndex:    'status',
+    valueType:    'checkbox',
+    valueEnum:    {
         1: {
             text:   '新数据',
             status: 'Success',
@@ -27,10 +28,9 @@ export const ColumnStatus: ProColumns = {
 
 export const ColumnSTATUS: ProColumns = {
     ...ColumnStatus,
-    initialValue: [1, 2, 3],
-    order:        10,
-    width:        70,
-    fixed:        'left',
+    order: 10,
+    width: 70,
+    fixed: 'left',
 };
 
 export const ColumnId: ProColumns = {

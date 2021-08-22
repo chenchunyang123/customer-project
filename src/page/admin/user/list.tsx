@@ -1,16 +1,18 @@
-import React, {useRef, useCallback, ReactNode}                    from 'react';
-import {useState}                                                 from 'react';
-import request                                                    from 'umi-request';
-import {ActionType, ProColumns, TableDropdown}                    from '@ant-design/pro-table';
-import {Avatar, Button, message}                                  from 'antd';
-import Form                                                       from './form';
-import ConfirmDelete                                              from '@/pack/confirmDelete';
-import ConfirmStatus                                              from '@/pack/confirmStatus';
-import used                                                       from "@/word/used";
-import {ActionMenuItem, Visit}                                    from "@/global";
-import {ColumnCreatedAT, ColumnID, ColumnSTATUS, ColumnUpdatedAT} from "@/word/enum";
-import TablePage                                                  from "@/pack/tablePage";
-import {PlusSquareTwoTone}                                        from "@ant-design/icons";
+import React, {useRef, useCallback, ReactNode, useContext}                  from 'react';
+import {useState}                                                           from 'react';
+import request                                                              from 'umi-request';
+import {ActionType, ProColumns, TableDropdown}                              from '@ant-design/pro-table';
+import {Avatar, Button, message}                                            from 'antd';
+import Form                                                                 from './form';
+import ConfirmDelete                                                        from '@/pack/confirmDelete';
+import ConfirmStatus                                                        from '@/pack/confirmStatus';
+import used                                                                 from "@/word/used";
+import {ActionMenuItem, Visit}                                              from "@/global";
+import {ColumnCreatedAT, ColumnID, ColumnSTATUS, ColumnUpdatedAT}           from "@/word/enum";
+import TablePage                                                            from "@/pack/tablePage";
+import {PlusSquareTwoTone}                                                  from "@ant-design/icons";
+import {AdminUserCreate, AdminUserDelete, AdminUserStatus, AdminUserUpdate} from "@/word/const";
+import {CanContext}                                                         from "@/word/state";
 
 interface Row {
     id: number;
@@ -33,6 +35,7 @@ const AdminUser: React.FC = () => {
         action: 'detail',
     });
     const actionRef = useRef<ActionType>();
+    const can = useContext(CanContext);
     const clearSelected = () => {
         ((actionRef.current as any as ActionType).clearSelected as any)();
     };
@@ -161,6 +164,7 @@ const AdminUser: React.FC = () => {
                 }
                 return [
                     (
+                        can[AdminUserUpdate] &&
                         <a
                             key="update"
                             onClick={() => {
@@ -263,6 +267,7 @@ const AdminUser: React.FC = () => {
                 actionRef={actionRef}
                 toolBarRender={() => [
                     (
+                        can[AdminUserCreate] &&
                         <Button
                             icon={<PlusSquareTwoTone/>}
                             onClick={() =>
@@ -278,6 +283,20 @@ const AdminUser: React.FC = () => {
                 setVisit={setVisit}
                 path={'/api/admin/user/list'}
                 selectedClear={clearSelected}
+                canSelection={(row: any) => (
+                    (
+                        row.status === 1 &&
+                        (
+                            !can[AdminUserDelete]
+                        )
+                    ) ||
+                    (
+                        row.status !== 1 &&
+                        (
+                            !can[AdminUserStatus]
+                        )
+                    )
+                )}
             />
         </>
     );

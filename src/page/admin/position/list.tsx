@@ -1,16 +1,17 @@
-import React, {useRef, useCallback, ReactNode}                    from 'react';
-import {useState}                                                 from 'react';
-import request                                                    from 'umi-request';
-import {ActionType, ProColumns, TableDropdown}                    from '@ant-design/pro-table';
-import {Button, message}                                          from 'antd';
-import Form                                                       from './form';
-import ConfirmDelete                                              from '@/pack/confirmDelete';
-import ConfirmStatus                                              from '@/pack/confirmStatus';
-import {ActionMenuItem, PositionOutline, Visit}                   from "@/global";
-import {ColumnCreatedAt, ColumnId, ColumnStatus, ColumnUpdatedAt} from "@/word/enum";
-import TablePage                                                  from "@/pack/tablePage";
-import {PlusSquareTwoTone}                                        from "@ant-design/icons";
-import {packQuery, packReq}                                       from "@/word/function";
+import React, {useRef, useCallback, ReactNode, useContext}                                  from 'react';
+import {useState}                                                                           from 'react';
+import request                                                                              from 'umi-request';
+import {ActionType, ProColumns, TableDropdown}                                              from '@ant-design/pro-table';
+import {Button, message}                                                                    from 'antd';
+import Form                                                                                 from './form';
+import ConfirmDelete                                                                        from '@/pack/confirmDelete';
+import ConfirmStatus                                                                        from '@/pack/confirmStatus';
+import {ActionMenuItem, Visit}                                                              from "@/global";
+import {ColumnCreatedAt, ColumnId, ColumnStatus, ColumnUpdatedAt}                           from "@/word/enum";
+import TablePage                                                                            from "@/pack/tablePage";
+import {PlusSquareTwoTone}                                                                  from "@ant-design/icons";
+import {AdminPositionCreate, AdminPositionDelete, AdminPositionStatus, AdminPositionUpdate} from "@/word/const";
+import {CanContext}                                                                         from "@/word/state";
 
 interface Row {
     id: number;
@@ -32,6 +33,7 @@ const AdminPosition: React.FC = () => {
         action: 'detail',
     });
     const actionRef = useRef<ActionType>();
+    const can = useContext(CanContext);
     const clearSelected = () => {
         ((actionRef.current as any as ActionType).clearSelected as any)();
     };
@@ -69,7 +71,7 @@ const AdminPosition: React.FC = () => {
             valueType: 'option',
             render:    (_, row) => {
                 let menuArr: ActionMenuItem[] = [];
-                if (row.status === 1) {
+                if (row.status === 1 && can[AdminPositionDelete]) {
                     menuArr.push({
                         key:  'delete',
                         name: (
@@ -95,6 +97,7 @@ const AdminPosition: React.FC = () => {
                 }
                 return [
                     (
+                        can[AdminPositionUpdate] &&
                         <a
                             key="update"
                             onClick={() => {
@@ -196,6 +199,7 @@ const AdminPosition: React.FC = () => {
                 actionRef={actionRef}
                 toolBarRender={() => [
                     (
+                        can[AdminPositionCreate] &&
                         <Button
                             icon={<PlusSquareTwoTone/>}
                             onClick={() =>
@@ -211,6 +215,20 @@ const AdminPosition: React.FC = () => {
                 setVisit={setVisit}
                 selectedClear={clearSelected}
                 path={'/api/admin/position/list'}
+                canSelection={(row: any) => (
+                    (
+                        row.status === 1 &&
+                        (
+                            !can[AdminPositionDelete]
+                        )
+                    ) ||
+                    (
+                        row.status !== 1 &&
+                        (
+                            !can[AdminPositionStatus]
+                        )
+                    )
+                )}
             />
         </>
     );

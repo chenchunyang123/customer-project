@@ -18,7 +18,11 @@ const App: React.FC = (props) => {
             let doc: any = {};
             for (let i = 0; i < menuOutlineArr.length; i++) {
                 const menuOutline = menuOutlineArr[i];
-                doc[menuOutline.method + menuOutline.path] = true;
+                if (menuOutline.method === '') {
+                    doc[menuOutline.path] = true;
+                } else {
+                    doc[menuOutline.path + ' ' + menuOutline.method] = true;
+                }
             }
             setCan(doc);
         }

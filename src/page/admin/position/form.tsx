@@ -1,14 +1,14 @@
-import React, {useEffect, useRef, useState}                                                                                                      from 'react';
+import React, {useEffect, useRef, useState}                                                                      from 'react';
 import ProForm, {
     FormInstance,
     ModalForm,
     ProFormDigit,
     ProFormSelect,
     ProFormText, ProFormTextArea,
-}                                                                                                                                                from '@ant-design/pro-form';
-import request                                                                                                                                   from 'umi-request';
-import {Checkbox, message, Table, TableColumnProps}                                                                                              from 'antd';
-import {DepartmentOutline, MenuGroupOutline, PageIdMenuGroupIdMap, PageIdMenuGroupOutlineArrMap, PageIdOutlineMap, PageOutline, ReOption, Visit} from "@/global";
+}                                                                                                                from '@ant-design/pro-form';
+import request                                                                                                   from 'umi-request';
+import {Checkbox, message, Table, TableColumnProps}                                                              from 'antd';
+import {MenuGroupOutline, PageIdMenuGroupIdMap, PageIdMenuGroupOutlineArrMap, PageIdOutlineMap, ReOption, Visit} from "@/global";
 
 interface Props {
     visit: Visit;
@@ -129,6 +129,7 @@ const Detail: React.FC<Props> = (props) => {
               [
                   {
                       title:  '页面名称',
+                      width:  120,
                       render: (_, row) => {
                           return {
                               children: <>{pageIdOutlineMap[row.admin_page_id].name}</>,

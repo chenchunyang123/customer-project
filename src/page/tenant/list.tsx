@@ -10,7 +10,8 @@ import {ActionMenuItem, Visit}                                    from "@/global
 import {ColumnCreatedAt, ColumnId, ColumnStatus, ColumnUpdatedAt} from "@/word/enum";
 import TablePage                                                  from "@/pack/tablePage";
 import {PlusSquareTwoTone, SyncOutlined}                          from "@ant-design/icons";
-import {UserinfoContext}                                          from "@/word/state";
+import {CanContext, UserinfoContext}                              from "@/word/state";
+import {TenantCreate, TenantDelete, TenantStatus, TenantUpdate}   from "@/word/const";
 
 interface Row {
     id: number;
@@ -32,12 +33,20 @@ const Tenant: React.FC = () => {
     });
     const actionRef = useRef<ActionType>();
     const userinfo = useContext(UserinfoContext);
+    const can = useContext(CanContext);
     const clearSelected = () => {
         ((actionRef.current as any as ActionType).clearSelected as any)();
     };
     const columns: ProColumns<Row>[] = [
         ColumnId,
         ColumnStatus,
+        {
+            title:     '名称',
+            dataIndex: 'name',
+            render:    (val, row) => (
+                <div dangerouslySetInnerHTML={{__html: row.name}}/>
+            )
+        },
         {
             title:     '所属用户',
             dataIndex: 'real_name',
@@ -50,13 +59,6 @@ const Tenant: React.FC = () => {
             dataIndex: 'phone',
             render:    (val, row) => (
                 <div dangerouslySetInnerHTML={{__html: row.phone}}/>
-            )
-        },
-        {
-            title:     '名称',
-            dataIndex: 'name',
-            render:    (val, row) => (
-                <div dangerouslySetInnerHTML={{__html: row.name}}/>
             )
         },
         {
@@ -81,54 +83,22 @@ const Tenant: React.FC = () => {
             valueType: 'option',
             render:    (_, row) => {
                 let menuArr: ActionMenuItem[] = [];
-                menuArr.push({
-                    key:  'lock',
-                    name: (
-                              <>
-                                  {
-                                      userinfo.userinfo.prv_id === row.id ?
-                                      <div className={'disabled-link'}>
-                                          <SyncOutlined spin/> 当前租户
-                                      </div> :
-                                      <a
-                                          onClick={() => {
-                                              request('/api/tenant/lock/' + row.id, {method: 'POST'})
-                                                  .then(
-                                                      ({status}) => {
-                                                          if (status === 200) {
-                                                              userinfo.setUserinfo({
-                                                                  ...userinfo.userinfo,
-                                                                  tenant_name:   row.name,
-                                                                  tenant_status: row.status,
-                                                                  prv_id:        row.id,
-                                                              });
-                                                          }
-                                                      }
-                                                  )
-                                          }}
-                                      >
-                                          切换租户
-                                      </a>
-                                  }
-                              </>
-
-                          )
-                });
-                if (row.status === 1) {
+                if (row.status === 1 && can[TenantDelete]) {
                     menuArr.push({
                         key:  'delete',
                         name: (
-                                  <ConfirmDelete
-                                      key={'delete'}
-                                      url="/tenant"
-                                      id_arr={[row.id]}
-                                      onConfirm={() => {
-                                          actionRef.current?.reload();
-                                          clearSelected();
-                                      }}
-                                  >
-                                      <span>删除</span>
-                                  </ConfirmDelete>
+                                  <div key={'delete'}>
+                                      <ConfirmDelete
+                                          key={'delete'}
+                                          url="/tenant/1"
+                                          id_arr={[row.id]}
+                                          onConfirm={() => {
+                                              actionRef.current?.reload();
+                                              clearSelected();
+                                          }}
+                                      >
+                                      </ConfirmDelete>
+                                  </div>
                               ),
                     });
                 }
@@ -140,6 +110,7 @@ const Tenant: React.FC = () => {
                 }
                 return [
                     (
+                        can[TenantUpdate] &&
                         <a
                             key="update"
                             onClick={() => {
@@ -153,6 +124,44 @@ const Tenant: React.FC = () => {
                         </a>
                     ),
                     jsx,
+                    <div key={'lock-block'}>
+                        {
+                            userinfo.userinfo.prv_id === row.id ?
+                            <div
+                                className={'disabled-link'}
+                                style={{
+                                    color: row.status === 1 ?
+                                           '#52c41a' :
+                                           row.status === 2 ?
+                                           '#1890ff' :
+                                           row.status === 3 ?
+                                           '#cd201f' :
+                                           '#c8c8c8'
+                                }}
+                            >
+                                <SyncOutlined spin/> 当前租户
+                            </div> :
+                            <a
+                                onClick={() => {
+                                    request('/api/tenant/lock/' + row.id, {method: 'POST'})
+                                        .then(
+                                            ({status}) => {
+                                                if (status === 200) {
+                                                    userinfo.setUserinfo({
+                                                        ...userinfo.userinfo,
+                                                        tenant_name:   row.name,
+                                                        tenant_status: row.status,
+                                                        prv_id:        row.id,
+                                                    });
+                                                }
+                                            }
+                                        )
+                                }}
+                            >
+                                切换租户
+                            </a>
+                        }
+                    </div>,
                 ];
             },
         },
@@ -165,14 +174,15 @@ const Tenant: React.FC = () => {
     }, []);
     const formFinish = useCallback(
         (data: any) => {
-            let path = '/api/tenant';
+            let path = '/api/tenant/1';
             let method = 'POST';
             if (visit.action === 'update') {
-                path = path + '/1/' + visit.id;
+                path = path + '/' + visit.id;
                 method = 'PUT';
             }
+            console.log(path, method);
             return request(path, {method, data}).then((res) => {
-                if (res.status === 200) {
+                if (res.status < 209) {
                     message.success('编辑成功');
                     cancel();
                     actionRef.current?.reload();
@@ -206,6 +216,7 @@ const Tenant: React.FC = () => {
                             </ConfirmDelete>
                         ),
                         (
+                            selectType === 'old' &&
                             <ConfirmStatus
                                 key="status"
                                 optionArr={[
@@ -240,6 +251,7 @@ const Tenant: React.FC = () => {
                 actionRef={actionRef}
                 toolBarRender={() => [
                     (
+                        can[TenantCreate] &&
                         <Button
                             icon={<PlusSquareTwoTone/>}
                             onClick={() =>
@@ -255,6 +267,20 @@ const Tenant: React.FC = () => {
                 setVisit={setVisit}
                 path={'/api/tenant/list'}
                 selectedClear={clearSelected}
+                canSelection={(row: any) => (
+                    (
+                        row.status === 1 &&
+                        (
+                            !can[TenantDelete]
+                        )
+                    ) ||
+                    (
+                        row.status !== 1 &&
+                        (
+                            !can[TenantStatus]
+                        )
+                    )
+                )}
             />
         </>
     );

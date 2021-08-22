@@ -34,6 +34,17 @@ const Detail: React.FC<Props> = (props) => {
             formRef.current?.resetFields();
             setStatus(1);
             setSelectDistrictOptions([]);
+            if (props.visit.id === 0 && props.visit.action === 'create') {
+                formRef.current?.setFieldsValue({
+                    license:     [],
+                    license_any: [],
+                });
+                new Promise(async resolve => {
+                    const mapOptions = await initDistrict([]);
+                    setDistrictOption(mapOptions);
+                    resolve(null);
+                })
+            }
             if (props.visit.id > 0 && props.visit.action === 'update') {
                 request('/api/tenant/1/' + props.visit.id, {method: 'POST'}).then(
                     async ({status: resStatus, data}) => {
@@ -68,7 +79,9 @@ const Detail: React.FC<Props> = (props) => {
                                 }
                             }
                             setDistrictOption([districtDoc]);
-                            setSelectDistrictOptions(selectedDistrictOptions);
+                            if (selectedDistrictOptions.length > 0) {
+                                setSelectDistrictOptions(selectedDistrictOptions);
+                            }
                             new Promise(async resolve => {
                                 const mapOptions = await initDistrict(district_id_arr);
                                 setDistrictOption(mapOptions);
@@ -195,7 +208,7 @@ const Detail: React.FC<Props> = (props) => {
                     <ReUpload
                         prefix={used.s3_prefix_license}
                         uploadProps={{
-                            multiple: false,
+                            multiple: true,
                             listType: "picture-card",
                             action:   '/api/tenant/upload/license_any/1',
                         }}

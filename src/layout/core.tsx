@@ -3,7 +3,7 @@ import {Avatar, Button, Layout, Menu, Tag, Typography}                          
 import {HomeOutlined, LockOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
 import css                                                                                                                      from './core.module.less';
 import used                                                                                                                     from "@/word/used";
-import {UserinfoContext}                                                                                                        from "@/word/state";
+import {CanContext, UserinfoContext}                                                                                            from "@/word/state";
 import {Route, Switch, useHistory}                                                                                              from "react-router-dom";
 import request                                                                                                                  from "umi-request";
 import SearchSelect                                                                                                             from "@/pack/searchSelect";
@@ -16,12 +16,13 @@ import Tenant                                                                   
 const {SubMenu} = Menu;
 
 const Core: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
     const userinfo = useContext(UserinfoContext);
+    const can = useContext(CanContext);
     const history = useHistory();
     return (
         <Layout className={css.root}>
-            <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
+            <Layout.Sider collapsible onCollapse={() => setCollapsed(!collapsed)} collapsed={collapsed}>
                 <div className={css.tag}>
                     <embed className={css.embed} src="/src/assets/logo.svg"/>
                     {
@@ -39,15 +40,24 @@ const Core: React.FC = () => {
                         租户列表
                     </Menu.Item>
                     <SubMenu key={'/admin'} level={1} icon={<SolutionOutlined/>} title={'后台权限'}>
-                        <Menu.Item key={'/admin/user'} onClick={() => history.push('/admin/user')}>
-                            管理员用户
-                        </Menu.Item>
-                        <Menu.Item key={'/admin/department'} onClick={() => history.push('/admin/department')}>
-                            管理员部门
-                        </Menu.Item>
-                        <Menu.Item key={'/admin/position'} onClick={() => history.push('/admin/position')}>
-                            管理员岗位
-                        </Menu.Item>
+                        {
+                            can['/admin/user'] &&
+                            <Menu.Item key={'/admin/user'} onClick={() => history.push('/admin/user')}>
+                                管理员用户
+                            </Menu.Item>
+                        }
+                        {
+                            can['/admin/department'] &&
+                            <Menu.Item key={'/admin/department'} onClick={() => history.push('/admin/department')}>
+                                管理员部门
+                            </Menu.Item>
+                        }
+                        {
+                            can['/admin/position'] &&
+                            <Menu.Item key={'/admin/position'} onClick={() => history.push('/admin/position')}>
+                                管理员岗位
+                            </Menu.Item>
+                        }
                     </SubMenu>
                 </Menu>
             </Layout.Sider>
