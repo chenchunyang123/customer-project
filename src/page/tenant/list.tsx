@@ -136,6 +136,9 @@ const Tenant: React.FC = () => {
                 path = path + '/1/' + visit.id;
                 method = 'PUT';
             }
+            if (data.license) {
+                data['license'] = data.license[0].name;
+            }
             return request(path, {method, data}).then((res) => {
                 if (res.status === 200) {
                     message.success('编辑成功');

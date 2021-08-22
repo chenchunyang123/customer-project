@@ -1,17 +1,17 @@
-import React, {useContext, useState}                                                                                                 from "react";
-import {Avatar, Button, Layout, Menu, Typography}                                                                                    from "antd";
-import {HomeOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PartitionOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
-import css                                                                                                                           from './core.module.less';
-import used                                                                                                                          from "@/word/used";
-import {UserinfoContext}                                                                                                             from "@/word/state";
-import {Route, Switch, useHistory}                                                                                                   from "react-router-dom";
-import request                                                                                                                       from "umi-request";
-import SearchSelect                                                                                                                  from "@/pack/searchSelect";
-import {HintMenu}                                                                                                                    from "@/word/hint";
-import AdminUser                                                                                                                     from "@/page/admin/user/list";
-import AdminDepartment                                                                                                               from "@/page/admin/department/list";
-import AdminPosition                                                                                                                 from "@/page/admin/position/list";
-import Tenant                                                                                                                        from "@/page/tenant/list";
+import React, {useContext, useState}                                                                              from "react";
+import {Avatar, Button, Layout, Menu, Typography}                                                                 from "antd";
+import {HomeOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
+import css                                                                                                        from './core.module.less';
+import used                                                                                                       from "@/word/used";
+import {UserinfoContext}                                                                                          from "@/word/state";
+import {Route, Switch, useHistory}                                                                                from "react-router-dom";
+import request                                                                                                    from "umi-request";
+import SearchSelect                                                                                               from "@/pack/searchSelect";
+import {HintMenu}                                                                                                 from "@/word/hint";
+import AdminUser                                                                                                  from "@/page/admin/user/list";
+import AdminDepartment                                                                                            from "@/page/admin/department/list";
+import AdminPosition                                                                                              from "@/page/admin/position/list";
+import Tenant                                                                                                     from "@/page/tenant/list";
 
 const {SubMenu} = Menu;
 
@@ -71,6 +71,7 @@ const Core: React.FC = () => {
                                         style={{width: 32, height: 32}}
                                         src={
                                             used.s3_api +
+                                            used.s3_prefix_avatar +
                                             userinfo.userinfo.avatar
                                         }
                                     />

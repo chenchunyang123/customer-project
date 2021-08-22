@@ -13,10 +13,12 @@
     "@types/react-router-dom": "^5.1.8",
     "ahooks": "^2.10.9",
     "antd": "^4.16.11",
+    "antd-img-crop": "^3.14.3",
     "clsx": "^1.1.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router-dom": "^5.2.0",
+    "ulid": "^2.3.0",
     "umi-request": "^1.3.9"
   },
   "devDependencies": {

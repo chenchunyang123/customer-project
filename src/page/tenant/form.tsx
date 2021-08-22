@@ -11,6 +11,9 @@ import {Cascader, Form, message}            from 'antd';
 import {Visit}                              from '@/global';
 import {CascaderOptionType}                 from "antd/es/cascader";
 import {initDistrict, loadDistrictNext}     from "@/word/map";
+import ReUpload                             from "@/pack/upload";
+import used                                 from "@/word/used";
+import {UploadFile}                         from "antd/es/upload/interface";
 
 interface Props {
     visit: Visit;
@@ -44,6 +47,8 @@ const Detail: React.FC<Props> = (props) => {
                                       address,
                                       real_name,
                                       phone,
+                                      license,
+                                      license_any,
                                       district_id_arr,
                                       district_name
                                   } = data;
@@ -70,10 +75,32 @@ const Detail: React.FC<Props> = (props) => {
                                 resolve(null);
                             })
                             setStatus(status);
+                            let licenseItem: UploadFile[] = [];
+                            if (license) {
+                                licenseItem.push({
+                                    uid:    '1',
+                                    name:   'license',
+                                    status: 'done',
+                                    url:    used.s3_api + used.s3_prefix_license + license,
+                                });
+                            }
+                            let licenseAnyItem: UploadFile[] = [];
+                            if (license_any) {
+                                for (let i = 0; i < license_any.length; i++) {
+                                    licenseAnyItem.push({
+                                        uid:    i.toString(),
+                                        name:   'license_any_' + i,
+                                        status: 'done',
+                                        url:    used.s3_api + used.s3_prefix_license_any + license_any[i],
+                                    });
+                                }
+                            }
                             formRef.current?.setFieldsValue({
-                                district: districtNames,
+                                district:    districtNames,
                                 real_name,
                                 phone,
+                                license:     licenseItem,
+                                license_any: licenseAnyItem,
                                 id,
                                 status,
                                 name,
@@ -93,7 +120,7 @@ const Detail: React.FC<Props> = (props) => {
     }
     return (
         <ModalForm
-            width={480}
+            width={480 + 17}
             formRef={formRef}
             title={
                 <>
@@ -115,7 +142,11 @@ const Detail: React.FC<Props> = (props) => {
                 ['create', 'update'].indexOf(props.visit.action) !== -1
             }
             modalProps={{
-                onCancel: props.onCancel,
+                bodyStyle: {
+                    height:    600,
+                    overflowY: 'auto'
+                },
+                onCancel:  props.onCancel,
             }}
             onFinish={(values) => {
                 let payload: any = {...values};
@@ -133,6 +164,30 @@ const Detail: React.FC<Props> = (props) => {
                 return props.onFinish(payload);
             }}
         >
+            <ProForm.Group label={'租户资质'}>
+                <Form.Item name={'license'} required label={'营业许可证'}>
+                    <ReUpload
+                        prefix={used.s3_prefix_license}
+                        uploadProps={{
+                            multiple: false,
+                            listType: "picture-card",
+                            action:   '/api/tenant/upload/license/1',
+                        }}
+                    />
+                </Form.Item>
+            </ProForm.Group>
+            <ProForm.Group>
+                <Form.Item name={'license_any'} required label={'其他许可证'}>
+                    <ReUpload
+                        prefix={used.s3_prefix_license}
+                        uploadProps={{
+                            multiple: false,
+                            listType: "picture-card",
+                            action:   '/api/tenant/upload/license_any/1',
+                        }}
+                    />
+                </Form.Item>
+            </ProForm.Group>
             <ProForm.Group label="选项">
                 <ProFormSelect
                     width={200}
