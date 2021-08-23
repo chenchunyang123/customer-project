@@ -29,7 +29,7 @@ export const ColumnStatus: ProColumns = {
 export const ColumnSTATUS: ProColumns = {
     ...ColumnStatus,
     order: 10,
-    width: 70,
+    width: 90,
     fixed: 'left',
 };
 
@@ -93,7 +93,7 @@ const updatedAt2: ProColumns = {
 };
 
 export const ColumnCreatedAt: ProColumns[] = [{...createdAt1}, createdAt2];
-export const ColumnCreatedAT: ProColumns[] = [{...createdAt1, fixed: 'right', width: 140,}, createdAt2];
+export const ColumnCreatedAT: ProColumns[] = [{...createdAt1, fixed: 'right', width: 180,}, createdAt2];
 
 export const ColumnUpdatedAt: ProColumns[] = [{...updatedAt1}, updatedAt2];
-export const ColumnUpdatedAT: ProColumns[] = [{...updatedAt1, fixed: 'right', width: 140,}, updatedAt2];
+export const ColumnUpdatedAT: ProColumns[] = [{...updatedAt1, fixed: 'right', width: 180,}, updatedAt2];
