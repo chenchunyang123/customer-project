@@ -11,8 +11,8 @@ import {HintMenu}                    from "@/word/hint";
 import AdminUser                     from "@/page/admin/user/list";
 import AdminDepartment               from "@/page/admin/department/list";
 import AdminPosition                 from "@/page/admin/position/list";
-import Tenant                                                  from "@/page/tenant/list";
-import {AdminDepartmentPage, AdminPositionPage, AdminUserPage} from "@/word/const";
+import Tenant                                                              from "@/page/tenant/list";
+import {AdminDepartmentPage, AdminPositionPage, AdminUserPage, TenantPage} from "@/word/const";
 
 const {SubMenu} = Menu;
 
@@ -37,7 +37,7 @@ const Core: React.FC = () => {
                     <Menu.Item key={'/home'} icon={<HomeOutlined/>}>
                         首页
                     </Menu.Item>
-                    <Menu.Item key={'/tenant'} icon={<UserSwitchOutlined/>} onClick={() => history.push('/tenant')}>
+                    <Menu.Item key={TenantPage} icon={<UserSwitchOutlined/>} onClick={() => history.push(TenantPage)}>
                         租户列表
                     </Menu.Item>
                     {
@@ -165,7 +165,7 @@ const Core: React.FC = () => {
                         <Route path={AdminPositionPage}>
                             <AdminPosition/>
                         </Route>
-                        <Route path={'/tenant'}>
+                        <Route path={TenantPage}>
                             <Tenant/>
                         </Route>
                     </Switch>
