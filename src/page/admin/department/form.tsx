@@ -30,7 +30,7 @@ const Detail: React.FC<Props> = (props) => {
                 request('/api/admin/department/' + props.visit.id, {method: 'POST'}).then(
                     ({status: resStatus, data}) => {
                         formRef.current?.resetFields();
-                        if (resStatus === 200) {
+                        if (resStatus < 209) {
                             const {status, id, name, description} =
                                       data;
                             setStatus(status);

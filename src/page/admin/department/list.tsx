@@ -115,7 +115,7 @@ const AdminDepartment: React.FC = () => {
                 method = 'PUT';
             }
             return request(path, {method, data}).then((res) => {
-                if (res.status === 200) {
+                if (res.status < 209) {
                     message.success('编辑成功');
                     cancel();
                     actionRef.current?.reload();
@@ -135,6 +135,7 @@ const AdminDepartment: React.FC = () => {
                 alertRender={(selectType, {selectedRowKeys}) => {
                     return [
                         (
+                            can[AdminDepartmentDelete] &&
                             selectType === 'new' &&
                             <ConfirmDelete
                                 key="deleteAction"
@@ -149,6 +150,8 @@ const AdminDepartment: React.FC = () => {
                             </ConfirmDelete>
                         ),
                         (
+                            can[AdminDepartmentStatus] &&
+                            selectType === 'old' &&
                             <ConfirmStatus
                                 key="status"
                                 optionArr={[

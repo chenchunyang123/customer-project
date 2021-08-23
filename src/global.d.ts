@@ -28,11 +28,10 @@ interface ReOption {
     label: string;
 }
 
-interface SubjectOutline {
+interface AdminUserOutline {
     id: number;
-    e_id: number;
-    name: string;
-    description: string;
+    real_name: string;
+    nick_name: string;
 }
 
 interface PositionOutline {
@@ -69,8 +68,6 @@ type DepartmentIdPositionIdMap = { [departmentId: number]: number };
 type PageIdMenuGroupOutlineArrMap = { [pageId: number]: MenuGroupOutline[] };
 
 type PageIdMenuGroupIdMap = { [pageId: number]: number };
-
-type EnterpriseSubjectMap = { [enterpriseId: number]: number[] };
 
 export interface Visit {
     id: number;

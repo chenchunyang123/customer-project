@@ -202,6 +202,7 @@ const Tenant: React.FC = () => {
                 alertRender={(selectType, {selectedRowKeys}) => {
                     return [
                         (
+                            can[TenantDelete] &&
                             selectType === 'new' &&
                             <ConfirmDelete
                                 key="deleteAction"
@@ -216,6 +217,7 @@ const Tenant: React.FC = () => {
                             </ConfirmDelete>
                         ),
                         (
+                            can[TenantStatus] &&
                             selectType === 'old' &&
                             <ConfirmStatus
                                 key="status"

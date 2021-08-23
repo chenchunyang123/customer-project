@@ -1,17 +1,18 @@
 import React, {useContext, useState}                                                                                            from "react";
 import {Avatar, Button, Layout, Menu, Tag, Typography}                                                                          from "antd";
 import {HomeOutlined, LockOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SolutionOutlined, UserSwitchOutlined} from "@ant-design/icons";
-import css                                                                                                                      from './core.module.less';
-import used                                                                                                                     from "@/word/used";
-import {CanContext, UserinfoContext}                                                                                            from "@/word/state";
-import {Route, Switch, useHistory}                                                                                              from "react-router-dom";
-import request                                                                                                                  from "umi-request";
-import SearchSelect                                                                                                             from "@/pack/searchSelect";
-import {HintMenu}                                                                                                               from "@/word/hint";
-import AdminUser                                                                                                                from "@/page/admin/user/list";
-import AdminDepartment                                                                                                          from "@/page/admin/department/list";
-import AdminPosition                                                                                                            from "@/page/admin/position/list";
-import Tenant                                                                                                                   from "@/page/tenant/list";
+import css                           from './core.module.less';
+import used                          from "@/word/used";
+import {CanContext, UserinfoContext} from "@/word/state";
+import {Route, Switch, useHistory}   from "react-router-dom";
+import request                       from "umi-request";
+import SearchSelect                  from "@/pack/searchSelect";
+import {HintMenu}                    from "@/word/hint";
+import AdminUser                     from "@/page/admin/user/list";
+import AdminDepartment               from "@/page/admin/department/list";
+import AdminPosition                 from "@/page/admin/position/list";
+import Tenant                                                  from "@/page/tenant/list";
+import {AdminDepartmentPage, AdminPositionPage, AdminUserPage} from "@/word/const";
 
 const {SubMenu} = Menu;
 
@@ -39,26 +40,33 @@ const Core: React.FC = () => {
                     <Menu.Item key={'/tenant'} icon={<UserSwitchOutlined/>} onClick={() => history.push('/tenant')}>
                         租户列表
                     </Menu.Item>
-                    <SubMenu key={'/admin'} level={1} icon={<SolutionOutlined/>} title={'后台权限'}>
-                        {
-                            can['/admin/user'] &&
-                            <Menu.Item key={'/admin/user'} onClick={() => history.push('/admin/user')}>
-                                管理员用户
-                            </Menu.Item>
-                        }
-                        {
-                            can['/admin/department'] &&
-                            <Menu.Item key={'/admin/department'} onClick={() => history.push('/admin/department')}>
-                                管理员部门
-                            </Menu.Item>
-                        }
-                        {
-                            can['/admin/position'] &&
-                            <Menu.Item key={'/admin/position'} onClick={() => history.push('/admin/position')}>
-                                管理员岗位
-                            </Menu.Item>
-                        }
-                    </SubMenu>
+                    {
+                        (
+                            can[AdminUserPage] ||
+                            can[AdminDepartmentPage] ||
+                            can[AdminPositionPage]
+                        ) &&
+                        <SubMenu key={'/admin'} level={1} icon={<SolutionOutlined/>} title={'后台权限'}>
+                            {
+                                can[AdminUserPage] &&
+                                <Menu.Item key={AdminUserPage} onClick={() => history.push(AdminUserPage)}>
+                                    管理员用户
+                                </Menu.Item>
+                            }
+                            {
+                                can[AdminDepartmentPage] &&
+                                <Menu.Item key={AdminDepartmentPage} onClick={() => history.push(AdminDepartmentPage)}>
+                                    管理员部门
+                                </Menu.Item>
+                            }
+                            {
+                                can[AdminPositionPage] &&
+                                <Menu.Item key={AdminPositionPage} onClick={() => history.push(AdminPositionPage)}>
+                                    管理员岗位
+                                </Menu.Item>
+                            }
+                        </SubMenu>
+                    }
                 </Menu>
             </Layout.Sider>
             <Layout className={css.right}>
@@ -148,13 +156,13 @@ const Core: React.FC = () => {
                     className={css.main}
                 >
                     <Switch>
-                        <Route path={'/admin/user'}>
+                        <Route path={AdminUserPage}>
                             <AdminUser/>
                         </Route>
-                        <Route path={'/admin/department'}>
+                        <Route path={AdminDepartmentPage}>
                             <AdminDepartment/>
                         </Route>
-                        <Route path={'/admin/position'}>
+                        <Route path={AdminPositionPage}>
                             <AdminPosition/>
                         </Route>
                         <Route path={'/tenant'}>
