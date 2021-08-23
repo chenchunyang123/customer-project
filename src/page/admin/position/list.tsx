@@ -130,7 +130,7 @@ const AdminPosition: React.FC = () => {
                 method = 'PUT';
             }
             return request(path, {method, data}).then((res) => {
-                if (res.status === 200) {
+                if (res.status < 209) {
                     message.success('编辑成功');
                     cancel();
                     actionRef.current?.reload();
