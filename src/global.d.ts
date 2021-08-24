@@ -79,5 +79,6 @@ export interface Visit {
         | 'syncPosition'
         | 'syncMenuGroup'
         | 'syncSubject'
-        | 'processBuilder';
+        | 'processBuilder'
+        | 'password';
 }

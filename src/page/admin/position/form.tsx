@@ -189,7 +189,7 @@ const Detail: React.FC<Props> = (props) => {
             formRef={formRef}
             title={
                 <>
-                    管理员用户
+                    管理员岗位
                     {props.visit.action === 'create' ? (
                         ' 创建'
                     ) : props.visit.action === 'update' ? (

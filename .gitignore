@@ -4,4 +4,6 @@ dist
 dist-ssr
 *.local
 
+*.log
+
 /src/word/used.ts
