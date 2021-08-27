@@ -7,7 +7,7 @@ import ProForm, {
     ProFormText,
 }                                                                                                                                        from '@ant-design/pro-form';
 import request                                                                                                                           from 'umi-request';
-import {message, Table, TableColumnProps}                                                                                                from 'antd';
+import {message, Spin, Table, TableColumnProps}                                                                                          from 'antd';
 import Checkbox                                                                                                                          from 'antd/lib/checkbox/Checkbox';
 import {DepartmentIdOutlineMap, DepartmentIdPositionIdMap, DepartmentIdPositionOutlineArrMap, DepartmentOutline, PositionOutline, Visit} from "@/global";
 
@@ -19,7 +19,7 @@ interface Props {
 
 const Detail: React.FC<Props> = (props) => {
     const formRef = useRef<FormInstance>();
-    const [status, setStatus] = useState<number>(1);
+    const [status, setStatus] = useState<number>(0);
     const [departmentIdOutlineMap, setDepartmentIdOutlineMap] = useState<DepartmentIdOutlineMap>({});
     const [positionOutlineArr, setPositionOutlineArr] = useState<PositionOutline[]>([]);
     const [departmentIdPositionIdMap, setDepartmentIdPositionIdMap] = useState<DepartmentIdPositionIdMap>({});
@@ -29,8 +29,11 @@ const Detail: React.FC<Props> = (props) => {
             (props.visit.id === 0 && props.visit.action === 'create')
         ) {
             formRef.current?.resetFields();
-            setStatus(1);
             setDepartmentIdPositionIdMap({});
+            setStatus(0);
+            if (props.visit.id === 0 && props.visit.action === 'create') {
+                setStatus(1);
+            }
             request('/api/admin/user/' + props.visit.id, {method: 'POST'}).then(
                 ({
                      data,
@@ -112,6 +115,8 @@ const Detail: React.FC<Props> = (props) => {
                                 } else {
                                     setDepartmentIdPositionIdMap({});
                                 }
+                            } else {
+                                setStatus(1);
                             }
                         }
                     )
@@ -216,102 +221,104 @@ const Detail: React.FC<Props> = (props) => {
                 });
             }}
         >
-            <div style={{display: 'flex'}}>
-                <div style={{width: 1100}}>
-                    <div style={{height: 557}}>
-                        <Table
-                            pagination={false}
-                            bordered
-                            rowKey="id"
-                            scroll={{y: 500}}
-                            columns={departmentPositionColumnArr}
-                            dataSource={positionOutlineArr}
-                        />
+            <Spin spinning={status < 1}>
+                <div style={{display: 'flex'}}>
+                    <div style={{width: 1100}}>
+                        <div style={{height: 557}}>
+                            <Table
+                                pagination={false}
+                                bordered
+                                rowKey="id"
+                                scroll={{y: 500}}
+                                columns={departmentPositionColumnArr}
+                                dataSource={positionOutlineArr}
+                            />
+                        </div>
+                    </div>
+                    <div style={{width: 480, padding: 24}}>
+                        <ProForm.Group label="选项">
+                            <ProFormSelect
+                                required
+                                disabled={props.visit.id === 0 || status === 1}
+                                name="status"
+                                label="管理员启用状态"
+                                width={200}
+                                options={
+                                    status === 1 ?
+                                    [
+                                        {label: '新数据', value: 1},
+                                    ] :
+                                    [
+                                        {label: '使用中', value: 2},
+                                        {label: '异常', value: 3},
+                                        {label: '停用', value: 4},
+                                    ]
+                                }
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group label="基本信息">
+                            <ProFormText
+                                required
+                                width={200}
+                                label="真实姓名"
+                                name="real_name"
+                                placeholder="请输入真实姓名"
+                            />
+                            <ProFormText
+                                required
+                                width={200}
+                                label="昵称"
+                                name="nick_name"
+                                placeholder="请输入昵称"
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group>
+                            <ProFormText
+                                required
+                                width={200}
+                                name="phone"
+                                label="手机号"
+                                tooltip="作为账号使用"
+                                placeholder="请输入手机号"
+                            />
+                            <ProFormText
+                                required
+                                width={200}
+                                name="code"
+                                label="人员编号"
+                                placeholder="请输入人员编号"
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group>
+                            <ProFormText
+                                width={432}
+                                name="email"
+                                label="邮箱"
+                                tooltip="可用于找回账号"
+                                placeholder="请输入邮箱"
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group>
+                            <ProFormSelect
+                                required
+                                label="性别"
+                                name="sex"
+                                width={200}
+                                options={[
+                                    {label: '男', value: 1},
+                                    {label: '女', value: 2},
+                                ]}
+                            />
+                            <ProFormDatePicker
+                                required
+                                label="生日"
+                                width={200}
+                                name="birth_at"
+                            />
+                        </ProForm.Group>
                     </div>
                 </div>
-                <div style={{width: 480, padding: 24}}>
-                    <ProForm.Group label="选项">
-                        <ProFormSelect
-                            required
-                            disabled={props.visit.id === 0 || status === 1}
-                            name="status"
-                            label="管理员启用状态"
-                            width={200}
-                            options={
-                                status === 1 ?
-                                [
-                                    {label: '新数据', value: 1},
-                                ] :
-                                [
-                                    {label: '使用中', value: 2},
-                                    {label: '异常', value: 3},
-                                    {label: '停用', value: 4},
-                                ]
-                            }
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group label="基本信息">
-                        <ProFormText
-                            required
-                            width={200}
-                            label="真实姓名"
-                            name="real_name"
-                            placeholder="请输入真实姓名"
-                        />
-                        <ProFormText
-                            required
-                            width={200}
-                            label="昵称"
-                            name="nick_name"
-                            placeholder="请输入昵称"
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group>
-                        <ProFormText
-                            required
-                            width={200}
-                            name="phone"
-                            label="手机号"
-                            tooltip="作为账号使用"
-                            placeholder="请输入手机号"
-                        />
-                        <ProFormText
-                            required
-                            width={200}
-                            name="code"
-                            label="人员编号"
-                            placeholder="请输入人员编号"
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group>
-                        <ProFormText
-                            width={432}
-                            name="email"
-                            label="邮箱"
-                            tooltip="可用于找回账号"
-                            placeholder="请输入邮箱"
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group>
-                        <ProFormSelect
-                            required
-                            label="性别"
-                            name="sex"
-                            width={200}
-                            options={[
-                                {label: '男', value: 1},
-                                {label: '女', value: 2},
-                            ]}
-                        />
-                        <ProFormDatePicker
-                            required
-                            label="生日"
-                            width={200}
-                            name="birth_at"
-                        />
-                    </ProForm.Group>
-                </div>
-            </div>
+            </Spin>
         </ModalForm>
     );
 };

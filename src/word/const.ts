@@ -24,3 +24,8 @@ export const AdminPositionDelete = '/admin/position DELETE';
 export const AdminPositionCreate = '/admin/position POST';
 export const AdminPositionUpdate = '/admin/position/* PUT';
 export const AdminPositionStatus = '/admin/position/status/* POST';
+
+export const RoughDelete = '/rough DELETE';
+export const RoughCreate = '/rough POST';
+export const RoughUpdate = '/rough/* PUT';
+export const RoughStatus = '/rough/status/* POST';

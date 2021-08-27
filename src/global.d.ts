@@ -57,6 +57,13 @@ interface DepartmentOutline {
     description: string;
 }
 
+interface PageProps {
+    Outline?: boolean
+    multiple?: boolean;
+    onChange?: (val: number[]) => any;
+    value?: number[];
+}
+
 type DepartmentIdOutlineMap = { [departmentId: number]: DepartmentOutline }
 
 type PageIdOutlineMap = { [pageId: number]: PageOutline }

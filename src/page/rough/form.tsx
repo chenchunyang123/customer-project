@@ -10,15 +10,18 @@ import request                              from 'umi-request';
 import {message, Spin}                      from 'antd';
 import {Visit}                              from '@/global';
 
+// rough-auto state-type
+
 interface Props {
     visit: Visit;
     onCancel: () => void;
     onFinish: (data: any) => Promise<boolean | void>;
 }
 
-const Detail: React.FC<Props> = (props) => {
+const Form: React.FC<Props> = (props) => {
     const formRef = useRef<FormInstance>();
     const [status, setStatus] = useState<number>(0);
+    // rough-auto use-state
     useEffect(() => {
         if (
             (props.visit.id > 0 && props.visit.action === 'update') ||
@@ -30,18 +33,20 @@ const Detail: React.FC<Props> = (props) => {
                 setStatus(1);
             }
             if (props.visit.id > 0 && props.visit.action === 'update') {
-                request('/api/admin/department/' + props.visit.id, {method: 'POST'}).then(
-                    ({status: resStatus, data}) => {
-                        formRef.current?.resetFields();
-                        if (resStatus < 209) {
-                            const {status, id, name, description} =
-                                      data;
+                request('/api/rough/' + props.visit.id, {method: 'POST'}).then(
+                    async ({
+                               status: resStatus,
+                               data,
+                               // rough-auto payload-params
+                           }) => {
+                        // rough-auto payload-tidy
+                        if (resStatus === 200) {
+                            const {
+                                      // rough-auto spread
+                                  } = data;
                             setStatus(status);
                             formRef.current?.setFieldsValue({
-                                id,
-                                status,
-                                name,
-                                description,
+                                // rough-auto spread
                             });
                         } else {
                             setStatus(1);
@@ -53,12 +58,12 @@ const Detail: React.FC<Props> = (props) => {
         }
     }, [props.visit.id]);
     return (
-        <ModalForm
+        <ModalForm<any>
             width={480}
             formRef={formRef}
             title={
                 <>
-                    部门
+                    毛坯
                     {props.visit.action === 'create' ? (
                         ' 创建'
                     ) : props.visit.action === 'update' ? (
@@ -76,9 +81,16 @@ const Detail: React.FC<Props> = (props) => {
                 ['create', 'update'].indexOf(props.visit.action) !== -1
             }
             modalProps={{
-                onCancel: props.onCancel,
+                bodyStyle: {
+                    height:    600,
+                    overflowY: 'auto'
+                },
+                onCancel:  props.onCancel,
             }}
-            onFinish={props.onFinish}
+            onFinish={(values) => {
+                let payload: any = {...values};
+                return props.onFinish(payload);
+            }}
         >
             <Spin spinning={status < 1}>
                 <ProForm.Group label="选项">
@@ -103,17 +115,23 @@ const Detail: React.FC<Props> = (props) => {
                 </ProForm.Group>
                 <ProForm.Group label="基本信息">
                     <ProFormText
-                        width={432}
-                        name="name"
-                        label="名称"
-                        placeholder="请输入名称"
+                        width={200}
+                        name="text"
+                        label="文本输入"
+                        placeholder="请输入文本输入"
+                    />
+                    <ProFormSelect
+                        required
+                        label="单选"
+                        width={200}
+                        name="check"
                     />
                 </ProForm.Group>
                 <ProForm.Group>
                     <ProFormTextArea
-                        label="职责描述"
+                        label="租户"
                         width={432}
-                        placeholder={'请输入职责描述'}
+                        placeholder={'请输入描述'}
                         name="description"
                     />
                 </ProForm.Group>
@@ -122,4 +140,4 @@ const Detail: React.FC<Props> = (props) => {
     );
 };
 
-export default Detail;
+export default Form;

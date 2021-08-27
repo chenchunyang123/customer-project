@@ -7,7 +7,7 @@ import Form                                                                 from
 import ConfirmDelete                                                        from '@/pack/confirmDelete';
 import ConfirmStatus                                                        from '@/pack/confirmStatus';
 import used                                                                 from "@/word/used";
-import {ActionMenuItem, Visit}                                              from "@/global";
+import {ActionMenuItem, PageProps, Visit}                                   from "@/global";
 import {ColumnCreatedAT, ColumnID, ColumnSTATUS, ColumnUpdatedAT}           from "@/word/enum";
 import TablePage                                                            from "@/pack/tablePage";
 import {PlusSquareTwoTone}                                                  from "@ant-design/icons";
@@ -29,7 +29,7 @@ interface Row {
     updated_at: string;
 }
 
-const AdminUser: React.FC = () => {
+const AdminUser: React.FC<PageProps> = (props) => {
     const [visit, setVisit] = useState<Visit>({
         id:     -1,
         action: 'detail',
@@ -213,7 +213,7 @@ const AdminUser: React.FC = () => {
     );
     return (
         <>
-            <Form visit={visit} onCancel={cancel} onFinish={formFinish}/>
+            {props.Outline !== true && <Form visit={visit} onCancel={cancel} onFinish={formFinish}/>}
             <TablePage
                 alertRender={(selectType, {selectedRowKeys}) => {
                     return [

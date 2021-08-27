@@ -7,7 +7,7 @@ import ProForm, {
     ProFormText, ProFormTextArea,
 }                                                                                                                from '@ant-design/pro-form';
 import request                                                                                                   from 'umi-request';
-import {Checkbox, message, Table, TableColumnProps}                                                              from 'antd';
+import {Checkbox, message, Spin, Table, TableColumnProps}                                                        from 'antd';
 import {MenuGroupOutline, PageIdMenuGroupIdMap, PageIdMenuGroupOutlineArrMap, PageIdOutlineMap, ReOption, Visit} from "@/global";
 
 interface Props {
@@ -18,11 +18,11 @@ interface Props {
 
 const Detail: React.FC<Props> = (props) => {
     const formRef = useRef<FormInstance>();
-    const [status, setStatus] = useState<number>(1);
+    const [status, setStatus] = useState<number>(0);
     const [pageIdOutlineMap, setPageIdOutlineMap] = useState<PageIdOutlineMap>({});
-    const [departmentOutlineArr, setDepartmentOutlineArr] = useState<ReOption[]>([]);
     const [menuGroupOutlineArr, setMenuGroupOutlineArr] = useState<MenuGroupOutline[]>([]);
     const [pageIdMenuGroupIdMap, setPageIdMenuGroupIdMap] = useState<PageIdMenuGroupIdMap>({});
+    const [departmentOutlineArr, setDepartmentOutlineArr] = useState<ReOption[]>([]);
     useEffect(() => {
         if (
             (props.visit.id > 0 && props.visit.action === 'update') ||
@@ -30,7 +30,7 @@ const Detail: React.FC<Props> = (props) => {
         ) {
             formRef.current?.resetFields();
             setPageIdMenuGroupIdMap({});
-            setStatus(1);
+            setStatus(0);
             if (
                 (props.visit.id > 0 && props.visit.action === 'update') ||
                 (props.visit.id === 0 && props.visit.action === 'create')
@@ -117,6 +117,8 @@ const Detail: React.FC<Props> = (props) => {
                                         description,
                                         admin_department_id
                                     });
+                                } else {
+                                    setStatus(1);
                                 }
                             }
                         )
@@ -225,75 +227,77 @@ const Detail: React.FC<Props> = (props) => {
                 });
             }}
         >
-            <div style={{display: 'flex'}}>
-                <div style={{width: 1100}}>
-                    <div>
-                        <Table
-                            pagination={false}
-                            bordered
-                            rowKey="id"
-                            scroll={{y: 500}}
-                            columns={pageMenuGroupColumnArr}
-                            dataSource={menuGroupOutlineArr}
-                        />
+            <Spin spinning={status < 1}>
+                <div style={{display: 'flex'}}>
+                    <div style={{width: 1100}}>
+                        <div>
+                            <Table
+                                pagination={false}
+                                bordered
+                                rowKey="id"
+                                scroll={{y: 500}}
+                                columns={pageMenuGroupColumnArr}
+                                dataSource={menuGroupOutlineArr}
+                            />
+                        </div>
+                    </div>
+                    <div style={{width: 480, padding: 24}}>
+                        <ProForm.Group label="状态选项">
+                            <ProFormSelect
+                                required
+                                label="岗位启用状态"
+                                width={200}
+                                name="status"
+                                disabled={props.visit.id === 0 || status === 1}
+                                options={
+                                    status === 1 ?
+                                    [
+                                        {label: '新数据', value: 1}
+                                    ] :
+                                    [
+                                        {label: '使用中', value: 2},
+                                        {label: '异常', value: 3},
+                                        {label: '停用', value: 4},
+                                    ]
+                                }
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group label="基本信息">
+                            <ProFormSelect
+                                required
+                                label="所属部门"
+                                width={200}
+                                name="admin_department_id"
+                                options={departmentOutlineArr}
+                            />
+                            <ProFormText
+                                required
+                                width={200}
+                                name="name"
+                                label="名称"
+                                placeholder="请输入名称"
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group>
+                            <ProFormDigit
+                                required
+                                width={200}
+                                name="weight"
+                                label="权重"
+                                placeholder="请输入权重"
+                            />
+                        </ProForm.Group>
+                        <ProForm.Group>
+                            <ProFormTextArea
+                                width={432}
+                                name="description"
+                                label="描述"
+                                placeholder="请输入描述"
+                            />
+                        </ProForm.Group>
                     </div>
                 </div>
-                <div style={{width: 480, padding: 24}}>
-                    <ProForm.Group label="状态选项">
-                        <ProFormSelect
-                            required
-                            label="岗位启用状态"
-                            width={200}
-                            name="status"
-                            disabled={props.visit.id === 0 || status === 1}
-                            options={
-                                status === 1 ?
-                                [
-                                    {label: '新数据', value: 1}
-                                ] :
-                                [
-                                    {label: '使用中', value: 2},
-                                    {label: '异常', value: 3},
-                                    {label: '停用', value: 4},
-                                ]
-                            }
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group label="基本信息">
-                        <ProFormSelect
-                            required
-                            label="所属部门"
-                            width={200}
-                            name="admin_department_id"
-                            options={departmentOutlineArr}
-                        />
-                        <ProFormText
-                            required
-                            width={200}
-                            name="name"
-                            label="名称"
-                            placeholder="请输入名称"
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group>
-                        <ProFormDigit
-                            required
-                            width={200}
-                            name="weight"
-                            label="权重"
-                            placeholder="请输入权重"
-                        />
-                    </ProForm.Group>
-                    <ProForm.Group>
-                        <ProFormTextArea
-                            width={432}
-                            name="description"
-                            label="描述"
-                            placeholder="请输入描述"
-                        />
-                    </ProForm.Group>
-                </div>
-            </div>
+            </Spin>
         </ModalForm>
     );
 };

@@ -7,3 +7,4 @@ dist-ssr
 *.log
 
 /src/word/used.ts
+/src/page/out/
