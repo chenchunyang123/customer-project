@@ -60,7 +60,7 @@ const AdminUser: React.FC<PageProps> = (props) => {
         {
             title:     '邮箱地址',
             dataIndex: 'email',
-            width:     180,
+            width:     220,
             ellipsis:  true,
             render:    (val, row) => (
                 <div className={'search'} dangerouslySetInnerHTML={{__html: row.email}}/>
@@ -278,7 +278,7 @@ const AdminUser: React.FC<PageProps> = (props) => {
                         </Button>
                     ),
                 ]}
-                scroll={{x: 1800, y: 400}}
+                scroll={{x: 2000, y: 400}}
                 columns={columns}
                 setVisit={setVisit}
                 path={'/api/admin/user/list'}

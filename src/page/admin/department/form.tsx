@@ -84,7 +84,13 @@ const Detail: React.FC<Props> = (props) => {
                 <ProForm.Group label="选项">
                     <ProFormSelect
                         width={200}
-                        required
+                        rules={[
+                            {
+                                required: true,
+                                message:  '请选择状态'
+                            }
+                        ]}
+                        allowClear={false}
                         label="启用状态"
                         name="status"
                         disabled={props.visit.id === 0 || status === 1}
@@ -103,10 +109,16 @@ const Detail: React.FC<Props> = (props) => {
                 </ProForm.Group>
                 <ProForm.Group label="基本信息">
                     <ProFormText
+                        rules={[
+                            {
+                                required: true,
+                                message:  '请输入部门名称'
+                            }
+                        ]}
                         width={432}
                         name="name"
-                        label="名称"
-                        placeholder="请输入名称"
+                        label="部门名称"
+                        placeholder="请输入部门名称"
                     />
                 </ProForm.Group>
                 <ProForm.Group>

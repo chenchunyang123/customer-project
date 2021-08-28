@@ -96,7 +96,13 @@ const Form: React.FC<Props> = (props) => {
                 <ProForm.Group label="选项">
                     <ProFormSelect
                         width={200}
-                        required
+                        rules={[
+                            {
+                                required: true,
+                                message:  '请选择状态'
+                            }
+                        ]}
+                        allowClear={false}
                         label="启用状态"
                         name="status"
                         disabled={props.visit.id === 0 || status === 1}

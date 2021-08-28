@@ -244,10 +244,16 @@ const Detail: React.FC<Props> = (props) => {
                     <div style={{width: 480, padding: 24}}>
                         <ProForm.Group label="状态选项">
                             <ProFormSelect
-                                required
                                 label="岗位启用状态"
                                 width={200}
                                 name="status"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请选择状态'
+                                    }
+                                ]}
+                                allowClear={false}
                                 disabled={props.visit.id === 0 || status === 1}
                                 options={
                                     status === 1 ?
@@ -264,23 +270,38 @@ const Detail: React.FC<Props> = (props) => {
                         </ProForm.Group>
                         <ProForm.Group label="基本信息">
                             <ProFormSelect
-                                required
                                 label="所属部门"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请选择所属部门'
+                                    }
+                                ]}
                                 width={200}
                                 name="admin_department_id"
                                 options={departmentOutlineArr}
                             />
                             <ProFormText
-                                required
                                 width={200}
                                 name="name"
-                                label="名称"
-                                placeholder="请输入名称"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入岗位名称'
+                                    }
+                                ]}
+                                label="岗位名称"
+                                placeholder="请输入岗位名称"
                             />
                         </ProForm.Group>
                         <ProForm.Group>
                             <ProFormDigit
-                                required
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入权重'
+                                    }
+                                ]}
                                 width={200}
                                 name="weight"
                                 label="权重"
@@ -291,8 +312,8 @@ const Detail: React.FC<Props> = (props) => {
                             <ProFormTextArea
                                 width={432}
                                 name="description"
-                                label="描述"
-                                placeholder="请输入描述"
+                                label="职责描述"
+                                placeholder="请输入职责描述"
                             />
                         </ProForm.Group>
                     </div>

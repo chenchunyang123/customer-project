@@ -1,15 +1,15 @@
-import React, {useEffect, useRef, useState}                                                                                              from 'react';
+import React, {useEffect, useRef, useState}                                                                           from 'react';
 import ProForm, {
     FormInstance,
     ModalForm,
     ProFormDatePicker,
     ProFormSelect,
     ProFormText,
-}                                                                                                                                        from '@ant-design/pro-form';
-import request                                                                                                                           from 'umi-request';
-import {message, Spin, Table, TableColumnProps}                                                                                          from 'antd';
-import Checkbox                                                                                                                          from 'antd/lib/checkbox/Checkbox';
-import {DepartmentIdOutlineMap, DepartmentIdPositionIdMap, DepartmentIdPositionOutlineArrMap, DepartmentOutline, PositionOutline, Visit} from "@/global";
+}                                                                                                                     from '@ant-design/pro-form';
+import request                                                                                                        from 'umi-request';
+import {message, Spin, Table, TableColumnProps}                                                                       from 'antd';
+import Checkbox                                                                                                       from 'antd/lib/checkbox/Checkbox';
+import {DepartmentIdOutlineMap, DepartmentIdPositionIdMap, DepartmentIdPositionOutlineArrMap, PositionOutline, Visit} from "@/global";
 
 interface Props {
     visit: Visit;
@@ -181,7 +181,7 @@ const Detail: React.FC<Props> = (props) => {
               ];
     return (
         <ModalForm
-            width={480 + 1100}
+            width={480 + 1100 + 20}
             formRef={formRef}
             title={
                 <>
@@ -238,8 +238,14 @@ const Detail: React.FC<Props> = (props) => {
                     <div style={{width: 480, padding: 24}}>
                         <ProForm.Group label="选项">
                             <ProFormSelect
-                                required
                                 disabled={props.visit.id === 0 || status === 1}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请选择状态'
+                                    }
+                                ]}
+                                allowClear={false}
                                 name="status"
                                 label="管理员启用状态"
                                 width={200}
@@ -258,14 +264,24 @@ const Detail: React.FC<Props> = (props) => {
                         </ProForm.Group>
                         <ProForm.Group label="基本信息">
                             <ProFormText
-                                required
                                 width={200}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入真实姓名'
+                                    }
+                                ]}
                                 label="真实姓名"
                                 name="real_name"
                                 placeholder="请输入真实姓名"
                             />
                             <ProFormText
-                                required
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入昵称'
+                                    }
+                                ]}
                                 width={200}
                                 label="昵称"
                                 name="nick_name"
@@ -274,15 +290,25 @@ const Detail: React.FC<Props> = (props) => {
                         </ProForm.Group>
                         <ProForm.Group>
                             <ProFormText
-                                required
                                 width={200}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入手机号'
+                                    }
+                                ]}
                                 name="phone"
                                 label="手机号"
                                 tooltip="作为账号使用"
                                 placeholder="请输入手机号"
                             />
                             <ProFormText
-                                required
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入人员编号'
+                                    }
+                                ]}
                                 width={200}
                                 name="code"
                                 label="人员编号"
@@ -291,16 +317,28 @@ const Detail: React.FC<Props> = (props) => {
                         </ProForm.Group>
                         <ProForm.Group>
                             <ProFormText
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请输入邮箱地址'
+                                    }
+                                ]}
                                 width={432}
                                 name="email"
-                                label="邮箱"
+                                label="邮箱地址"
                                 tooltip="可用于找回账号"
-                                placeholder="请输入邮箱"
+                                placeholder="请输入邮箱地址"
                             />
                         </ProForm.Group>
                         <ProForm.Group>
                             <ProFormSelect
-                                required
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请选择性别'
+                                    }
+                                ]}
+                                allowClear={false}
                                 label="性别"
                                 name="sex"
                                 width={200}
@@ -310,8 +348,14 @@ const Detail: React.FC<Props> = (props) => {
                                 ]}
                             />
                             <ProFormDatePicker
-                                required
-                                label="生日"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:  '请选择生日日期'
+                                    }
+                                ]}
+                                allowClear={false}
+                                label="生日日期"
                                 width={200}
                                 name="birth_at"
                             />
