@@ -212,6 +212,7 @@ const Rough: React.FC<PageProps> = (props) => {
                         </Button>
                     ),
                 ]}
+                headerTitle={'毛坯'}
                 scroll={{y: 400}}
                 columns={columns}
                 setVisit={setVisit}
