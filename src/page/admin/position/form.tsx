@@ -249,7 +249,7 @@ const Detail: React.FC<Props> = (props) => {
                                 name="status"
                                 rules={[
                                     {
-                                        required: true,
+                                        required: props.visit.action !== 'create',
                                         message:  '请选择状态'
                                     }
                                 ]}

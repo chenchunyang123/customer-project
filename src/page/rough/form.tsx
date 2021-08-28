@@ -98,7 +98,7 @@ const Form: React.FC<Props> = (props) => {
                         width={200}
                         rules={[
                             {
-                                required: true,
+                                required: props.visit.action !== 'create',
                                 message:  '请选择状态'
                             }
                         ]}

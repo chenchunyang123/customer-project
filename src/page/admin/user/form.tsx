@@ -241,7 +241,7 @@ const Detail: React.FC<Props> = (props) => {
                                 disabled={props.visit.id === 0 || status === 1}
                                 rules={[
                                     {
-                                        required: true,
+                                        required: props.visit.action !== 'create',
                                         message:  '请选择状态'
                                     }
                                 ]}
