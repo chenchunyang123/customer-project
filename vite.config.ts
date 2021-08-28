@@ -4,6 +4,7 @@ import {defineConfig} from 'vite'
 import reactRefresh   from '@vitejs/plugin-react-refresh'
 // @ts-ignore
 import path           from "path";
+import used           from "./src/word/used";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,7 +17,7 @@ export default defineConfig({
     server:  {
         proxy: {
             '/api': {
-                target:       'http://localhost:10001',
+                target:       used.target,
                 changeOrigin: true,
                 rewrite:      path1 => path1.replace(/^\/api/, '')
             }
